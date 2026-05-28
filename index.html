@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FE — Sandwichería Artesanal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo"><img src="imagenes/Fe.png" alt="" height="70px"></div>
+  <ul>
+    <li><a href="#menu">Menú</a></li>
+    <li><a href="#como-funciona">Cómo funciona</a></li>
+    <li><a href="#">Locales</a></li>
+    <li><a href="#" class="btn-nav">Pedir ahora</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">🥪 Sandwichería artesanal · Delivery express</div>
+      <h1>Armado a tu <em>gusto,</em> entregado caliente</h1>
+      <p>Elige tu base y personaliza cada ingrediente. Pan artesanal, rellenos frescos y listo a tu espera.</p>
+      <div class="hero-btns">
+        <a href="#menu" class="btn-gold">🛠 Armar mi sandwich</a>
+        <a href="#como-funciona" class="btn-ghost">Ver cómo funciona</a>
+      </div>
+    </div>
+
+    <div class="hero-sandwich">
+      <div class="sandwich-layer sl-pan-top">🍞 Pan artesanal</div>
+      <div class="sandwich-layer sl-lechuga">🥬 Lechuga</div>
+      <div class="sandwich-layer sl-tomate">🍅 Tomate</div>
+      <div class="sandwich-layer sl-queso">🧀 Queso laminado</div>
+      <div class="sandwich-layer sl-carne">🥩 Carne mechada</div>
+      <div class="sandwich-layer sl-huevo">🥚 Huevo frito</div>
+      <div class="sandwich-layer sl-pan-bot">🍞 Pan artesanal</div>
+      <div class="sandwich-tag">✨ Cada capa, a tu elección</div>
+    </div>
+  </div>
+</section>
+
+<!-- MENÚ -->
+<section class="section" id="menu">
+  <span class="section-label">Nuestras bases</span>
+  <h2 class="section-title fade-in">Escoge y personaliza</h2>
+
+  <div class="menu-grid">
+
+    <div class="menu-card" onclick="openModal('Clásico de huevo','El favorito de siempre: con huevo, queso, tocino.',['🥚 Huevo','🧀 Queso','🥓 tocino'],2500,'bg-1')">
+      <div class="card-img bg-1">
+        🥚
+        <span class="card-badge">🥚 1</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Clásico de huevo</div>
+        <div class="card-desc">Con huevo, queso y tocino.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥚 Huevo</span>
+          <span class="ing-tag">🧀 Queso</span>
+          <span class="ing-tag">🥓 Tocino</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$2.500</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Huevo y Palta','El clásico chileno elevado, cremoso y reconfortante.',['🥚 Huevo frito','🥑 Palta','🧀 Queso'],2500,'bg-2')">
+      <div class="card-img bg-2">
+        🥚
+        <span class="card-badge">🥚2</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Huevo y Palta</div>
+        <div class="card-desc">Huevo frito con palta cremosa y queso.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥚 Huevo</span>
+          <span class="ing-tag">🥑 Palta</span>
+          <span class="ing-tag">🧀 Queso</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$2.500</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Huevo y Tocino','con Huevo y Tocino',['🥚 Huevo','🥓 tocino'],2000,'bg-1')">
+      <div class="card-img bg-1">
+        🥚
+        <span class="card-badge">🥚 3</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Huevo y Tocino</div>
+        <div class="card-desc">Con huevo y tocino.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥚 Huevo</span>
+          <span class="ing-tag">🥓 Tocino</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$2.500</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Huevo y Queso','Simple, pero sabroso: con huevo y queso.',['🥚 Huevo','🧀 Queso'],2000,'bg-1')">
+      <div class="card-img bg-1">
+        🥚
+        <span class="card-badge">🥚 4</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Huevo y queso</div>
+        <div class="card-desc">Con huevo y queso.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥚 Huevo</span>
+          <span class="ing-tag">🧀 Queso</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$2.000</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Huevo y Ciboulette','con Huevo y ciboulette',['🥚 Huevo','🌿 Ciboulette'],1500,'bg-1')">
+      <div class="card-img bg-1">
+        🥚
+        <span class="card-badge">🥚 5</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Huevo y Ciboulette</div>
+        <div class="card-desc">Con huevo y Ciboulette.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥚 Huevo</span>
+          <span class="ing-tag">🌿 Ciboulette</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$1.500</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Mechada clásica','con Mechada y 2 Huevos fritos.',['🥩 Mechada','🍳 Huevo Frito','🍳 Huevo frito'],3000,'bg-3')">
+      <div class="card-img bg-3">
+        🥩
+        <span class="card-badge">🔥 Nuevo</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Mechada clásica</div>
+        <div class="card-desc">Con Mechada y 2 Huevos fritos.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥩 Mechada</span>
+          <span class="ing-tag">🍳 Huevos fritos</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$3.000</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Veggie Completo','Sin carne pero lleno de sabor, con queso fundido y palta.',['🥑 Palta','🧀 Queso','🍅 Tomate','🥬 Lechuga','🌽 Choclo'],3490,'bg-4')">
+      <div class="card-img bg-4">
+        🥑
+        <span class="card-badge">🌱 Veggie</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Veggie Completo</div>
+        <div class="card-desc">Palta, queso laminado, choclo, lechuga y tomate. Sin carne, sin culpa.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🥑 Palta</span>
+          <span class="ing-tag">🧀 Queso</span>
+          <span class="ing-tag">🌽 Choclo</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$3.490</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Lomito Especial','Lomo de cerdo jugoso, tomate, palta y mayo. El rey de la sandwichería.',['🐷 Lomito cerdo','🥑 Palta','🍅 Tomate','🥬 Lechuga'],5490,'bg-5')">
+      <div class="card-img bg-5">
+        🐷
+        <span class="card-badge">👑 Especial</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Lomito Especial</div>
+        <div class="card-desc">Lomo de cerdo tierno, palta, tomate y lechuga. El más pedido.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🐷 Lomito</span>
+          <span class="ing-tag">🥑 Palta</span>
+          <span class="ing-tag">🍅 Tomate</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$5.490</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-card" onclick="openModal('Salmón Ahumado','Elegante y fresco, con salmón, queso crema y pepino.',['🐟 Salmón','🧀 Queso crema','🥒 Pepino','🥬 Rúcula'],5990,'bg-6')">
+      <div class="card-img bg-6">
+        🐟
+        <span class="card-badge">✨ Premium</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Salmón Ahumado</div>
+        <div class="card-desc">Salmón ahumado patagónico, queso crema, rúcula y pepino fresco.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🐟 Salmón</span>
+          <span class="ing-tag">🧀 Q. crema</span>
+          <span class="ing-tag">🥬 Rúcula</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$5.990</span>
+          <button class="btn-customize">✏️ Personalizar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL EDITOR -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-name">Sandwich</div>
+        <div class="modal-subtitle" id="modal-desc">Personaliza tu pedido</div>
+      </div>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Visualización en capas -->
+      <div class="sandwich-preview">
+        <div class="preview-title">Vista de capas</div>
+        <div id="preview-layers"></div>
+      </div>
+
+      <!-- Tipo de pan -->
+      <div class="ing-section-title">🍞 Tipo de pan</div>
+      <div class="pan-options" id="pan-options">
+        <button class="pan-btn selected" data-pan="Marraqueta" onclick="selectPan(this)">🫓 Marraqueta</button>
+        <button class="pan-btn" data-pan="Ciabatta"  onclick="selectPan(this)">🍞 Ciabatta</button>
+        <button class="pan-btn" data-pan="Árabe"     onclick="selectPan(this)">🫓 Pan árabe</button>
+        <button class="pan-btn" data-pan="Integral"  onclick="selectPan(this)">🌾 Integral</button>
+        <button class="pan-btn" data-pan="Brioche"   onclick="selectPan(this)">🍔 Brioche (+$300)</button>
+      </div>
+
+      <!-- Ingredientes base (incluidos) -->
+      <div class="ing-section">
+        <div class="ing-section-title">✅ Ingredientes incluidos</div>
+        <div class="ing-options" id="base-ings"></div>
+      </div>
+
+      <!-- Extras -->
+      <div class="ing-section">
+        <div class="ing-section-title">➕ Agrega extras</div>
+        <div class="ing-options" id="extra-ings"></div>
+      </div>
+
+      <!-- Salsas -->
+      <div class="ing-section">
+        <div class="ing-section-title">🧴 Salsas</div>
+        <div class="ing-options" id="sauce-ings"></div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <div>
+        <div class="total-label">Total</div>
+        <div class="total-price" id="modal-total">$0</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="qty-num">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <button class="btn-add-cart" onclick="addToCart()">🛒 Agregar al pedido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CÓMO FUNCIONA -->
+<section class="section how" id="como-funciona">
+  <span class="section-label" style="color:var(--dorado)">El proceso</span>
+  <h2 class="section-title">Simple como morder</h2>
+  <div class="steps">
+    <div class="step fade-in delay-1">
+      <div class="step-num">01</div>
+      <div class="step-icon">🥪</div>
+      <h3>Elige tu base</h3>
+      <p>Selecciona el sandwich que más te guste del menú.</p>
+    </div>
+    <div class="step fade-in delay-2">
+      <div class="step-num">02</div>
+      <div class="step-icon">✏️</div>
+      <h3>Personaliza</h3>
+      <p>Agrega o quita ingredientes, cambia el pan y elige tus salsas.</p>
+    </div>
+    <div class="step fade-in delay-3">
+      <div class="step-num">03</div>
+      <div class="step-icon">💳</div>
+      <h3>Paga seguro</h3>
+      <p>Transferencia, tarjeta o efectivo. Cualquier medio de pago que necesites.</p>
+    </div>
+    <div class="step fade-in delay-1">
+      <div class="step-num">04</div>
+      <div class="step-icon">💬</div>
+      <h3>Te espera caliente</h3>
+      <p>Te llegará una notificación cuando tu sandwich esté listo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA (comentado en el original)
+<div class="cta-banner">
+  <h2>Primera orden: <u>envío gratis</u> con el código <strong>LAMIGA1</strong></h2>
+  <a href="#menu" class="btn-gold">🥪 Pedir ahora</a>
+</div> -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <div class="logo"><span>FE (Fito y Eli)</span></div>
+    <p>Sandwichería artesanal con alma local. Ingredientes frescos, pan de verdad y entregas rápidas.</p>
+  </div>
+  <div>
+    <h4>Menú</h4>
+    <ul>
+      <li><a href="#">Sandwiches</a></li>
+      <li><a href="#">Combos</a></li>
+      <li><a href="#">Bebidas</a></li>
+      <li><a href="#">Postres</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Nosotros</h4>
+    <ul>
+      <li><a href="#">Nuestra historia</a></li>
+      <li><a href="#">Proveedores</a></li>
+      <li><a href="#">Trabaja con nosotros</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Contacto</h4>
+    <ul>
+      <li><a href="#">📞 +56 9 8765 4321</a></li>
+      <li><a href="#">✉️ hola@lamiga.cl</a></li>
+      <li><a href="#">📍 Puerto Montt, Chile</a></li>
+      <li><a href="#">💬 WhatsApp</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FE — Todos los derechos reservados</span>
+    <span>Política de privacidad · Términos</span>
+  </div>
+</footer>
+
+<!-- FAB CARRITO -->
+<a href="#" class="cart-fab">🛒<span class="badge" id="cart-badge">0</span></a>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+<!--                              ###########
+                              ###################
+                           #########################
+                         #############################
+                       *###############################*
+                      *#######################*#########*
+                      ########=.#%=  =####--%@=  -########
+                     ########-%@@@+   :##:%@@@+   :#######
+                     ########.-#+. -*  ##.-+-  +#..#######
+                     ########*    =%% *###.   *%*.*#######
+                     ###########*==*########****##########
+                     #####################################
+                     #########################++=#########
+                    #######################*=+###=##########
+                 #################*+++++*######################
+              ###################################################*
+            ########################################################
+           ##########################################################*
+         ##############################################################
+       ##################################################################
+      #######################################################+-###########
+     ############=--**##############################****+---*##############
+    *#################***+-#######################-*########################
+    ######################-*#####################=+#############=-##########*
+   ################+------########################*--+****+=:-=##############
+  ############################################################################
+  ############################################################################
+ *#############################################################################
+ ##############################################################################
+ ##############################################################################
+ ##############################################################################
+ ##############################################################################
+ ##############################################################################
+  #############################################################################
+  ############################################################################
+  ############################################################################
+   *#########################################################################
+    ########################################################################
+     ######################################################################
+      ####################################################################
+       ##################################################################
+         ###############################################################
+          ############################################################
+           ##########################################################
+             :####################################################*
+                ################################################
+                  ############################################
+                      ####################################
+                           ##########################
+                                  ###########*
+-->
+</html>
