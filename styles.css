@@ -323,7 +323,7 @@ nav ul li a:hover { color: var(--cafe-medio); }
 
 /* Visualización del sandwich */
 .sandwich-preview {
-  background: var(--negro);
+  background: #2a1a0e;
   border-radius: 18px;
   padding: 1.5rem;
   margin-bottom: 1.8rem;
@@ -558,3 +558,40 @@ footer ul li a:hover { color: var(--dorado); }
   footer             { grid-template-columns: 1fr; }
   .cta-banner        { text-align: center; justify-content: center; }
 }
+
+/* ── BANNER MENÚ ─────────────────────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 3rem 0 1.5rem 0;
+}
+
+.section-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #3d2b1f;
+  color: #f5e6cc;
+  padding: 9px 22px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, #c9a96e, transparent);
+}
+
+/*── Postres ─────────────────────────────────────────────── */
+.bg-postre-1 { background: #f5e6d3; }
+.bg-postre-2 { background: #ede0f5; }
+/* Modo postre: oculta todo lo que no aplica */
+.modal.modo-postre .sandwich-preview { display: none !important; }
+.modal.modo-postre .ing-section      { display: none !important; }
+.modal.modo-postre .pan-options      { display: none !important; }
+.modal.modo-postre .ing-section-title { display: none !important; }

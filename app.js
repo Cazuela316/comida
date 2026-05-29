@@ -75,6 +75,12 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.querySelector('.modal').classList.remove('modo-postre'); // ← agrega esto
+  document.body.style.overflow = '';
+}
+
 // Cerrar al hacer clic en el fondo
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target === document.getElementById('modal')) closeModal();
@@ -239,3 +245,25 @@ const obs = new IntersectionObserver(entries => {
 }, { threshold: 0.1 });
 
 document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+
+//Sección postre -----------------------------------------------------------------------
+
+function openPostreModal(nombre, desc, precio) {
+  // Usa la misma lógica de apertura que sandwiches
+  currentSandwich = { name: nombre, desc, baseIngs: [], basePrice: precio };
+  selectedExtras  = new Set();
+  selectedSauces  = new Set();
+  qty = 1;
+
+  document.getElementById('modal-name').textContent = nombre;
+  document.getElementById('modal-desc').textContent = desc;
+  document.getElementById('qty-num').textContent = '1';
+  updateTotal();
+
+  // Activa modo postre (oculta secciones vía CSS)
+  document.querySelector('.modal').classList.add('modo-postre');
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
