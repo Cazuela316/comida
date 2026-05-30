@@ -412,7 +412,7 @@ function seleccionarBebida(tipo, id) {
 
 // ── SANDWICH PERSONALIZADO ────────────────────────────────────
 function openCustomModal() {
-  openModal('🛠 Sandwich Personalizado', 'Arma tu sandwich desde cero.', [], 3000, 'bg-custom');
+  openModal('🛠 Sandwich Personalizado', 'Arma tu sandwich desde cero.', [], 1000, 'bg-custom');
   document.getElementById('base-ings').innerHTML = `
     <div style="font-size:.8rem;color:var(--gris);padding:.4rem .2rem;font-style:italic">
       Este sandwich no trae ingredientes por defecto — agrega los que quieras en "Extras" 👇
