@@ -15,8 +15,7 @@
   <ul>
     <li><a href="#menu">Menú</a></li>
     <li><a href="#como-funciona">Cómo funciona</a></li>
-    <li><a href="#">Locales</a></li>
-    <li><a href="#" class="btn-nav">Pedir ahora</a></li>
+    <li><a href="#" class="btn-nav btn-login-nav" onclick="openAuthModal(event)" id="nav-auth-btn">👤 Iniciar sesión</a></li>
   </ul>
 </nav>
 
@@ -24,9 +23,13 @@
 <section class="hero">
   <div class="hero-inner">
     <div>
-      <div class="hero-label">🥪 Sandwichería artesanal · Delivery express</div>
+      <div class="hero-label">🥪 Sandwichería artesanal</div>
       <h1>Armado a tu <em>gusto,</em> entregado caliente</h1>
       <p>Elige tu base y personaliza cada ingrediente. Pan artesanal, rellenos frescos y listo a tu espera.</p>
+      <div class="hero-schedule">
+        <span class="hero-schedule-dot" id="hero-schedule-dot"></span>
+        <span id="hero-schedule-text">Cargando horario…</span>
+      </div>
       <div class="hero-btns">
         <a href="#menu" class="btn-gold">🛠 Armar mi sandwich</a>
         <a href="#como-funciona" class="btn-ghost">Ver cómo funciona</a>
@@ -60,11 +63,12 @@
   </div>
   <div class="menu-grid">
 
-    <div class="menu-card" onclick="openModal('Clásico de huevo','El favorito de siempre: con huevo, queso, tocino.',['🥚 Huevo','🧀 Queso','🥓 tocino'],2500,'bg-1')">
+    <div class="menu-card" data-menu-id="sandwich-huevo-1" onclick="openModal('Clásico de huevo','El favorito de siempre: con huevo, queso, tocino.',['🥚 Huevo','🧀 Queso','🥓 tocino'],2500,'bg-1')">
       <div class="card-img bg-1">
         🥚
         <span class="card-badge">🥚 1</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Clásico de huevo</div>
         <div class="card-desc">Con huevo, queso y tocino.</div>
@@ -80,11 +84,12 @@
       </div>
     </div>
 
-    <div class="menu-card" onclick="openModal('Huevo, Palta y Queso','El clásico chileno elevado, cremoso y reconfortante.',['🥚 Huevo frito','🥑 Palta','🧀 Queso'],2500,'bg-2')">
+    <div class="menu-card" data-menu-id="sandwich-huevo-2" onclick="openModal('Huevo, Palta y Queso','El clásico chileno elevado, cremoso y reconfortante.',['🥚 Huevo frito','🥑 Palta','🧀 Queso'],2500,'bg-2')">
       <div class="card-img bg-2">
         🥚
         <span class="card-badge">🥚2</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Huevo y Palta</div>
         <div class="card-desc">Huevo frito con palta cremosa y queso.</div>
@@ -100,11 +105,12 @@
       </div>
     </div>
 
-    <div class="menu-card" onclick="openModal('Huevo y Tocino','con Huevo y Tocino',['🥚 Huevo','🥓 tocino'],2000,'bg-1')">
+    <div class="menu-card" data-menu-id="sandwich-huevo-3" onclick="openModal('Huevo y Tocino','con Huevo y Tocino',['🥚 Huevo','🥓 tocino'],2000,'bg-1')">
       <div class="card-img bg-1">
         🥚
         <span class="card-badge">🥚 3</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Huevo y Tocino</div>
         <div class="card-desc">Con huevo y tocino.</div>
@@ -119,11 +125,12 @@
       </div>
     </div>
 
-    <div class="menu-card" onclick="openModal('Huevo y Queso','Simple, pero sabroso: con huevo y queso.',['🥚 Huevo','🧀 Queso'],2000,'bg-1')">
+    <div class="menu-card" data-menu-id="sandwich-huevo-4" onclick="openModal('Huevo y Queso','Simple, pero sabroso: con huevo y queso.',['🥚 Huevo','🧀 Queso'],2000,'bg-1')">
       <div class="card-img bg-1">
         🥚
         <span class="card-badge">🥚 4</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Huevo y queso</div>
         <div class="card-desc">Con huevo y queso.</div>
@@ -138,11 +145,12 @@
       </div>
     </div>
 
-    <div class="menu-card" onclick="openModal('Huevo y Ciboulette','con Huevo y ciboulette',['🥚 Huevo','🌿 Ciboulette'],1500,'bg-1')">
+    <div class="menu-card" data-menu-id="sandwich-huevo-5" onclick="openModal('Huevo y Ciboulette','con Huevo y ciboulette',['🥚 Huevo','🌿 Ciboulette'],1500,'bg-1')">
       <div class="card-img bg-1">
         🥚
         <span class="card-badge">🥚 5</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Huevo y Ciboulette</div>
         <div class="card-desc">Con huevo y Ciboulette.</div>
@@ -166,11 +174,12 @@
     </div>
     <div class="menu-grid">
 
-    <div class="menu-card" onclick="openModal('Mechada clásica','con Mechada y 2 Huevos fritos.',['🥩 Carne Mechada','🍳 Huevo Frito','🍳 Huevo Frito'],3000,'bg-3')">
+    <div class="menu-card" data-menu-id="sandwich-mechada-1" onclick="openModal('Mechada clásica','con Mechada y 2 Huevos fritos.',['🥩 Carne Mechada','🍳 Huevo Frito','🍳 Huevo Frito'],3000,'bg-3')">
       <div class="card-img bg-3">
         🥩
         <span class="card-badge">🔥 Nuevo</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Mechada clásica</div>
         <div class="card-desc">Con Mechada y 2 Huevos fritos.</div>
@@ -192,11 +201,12 @@
     <div class="divider-line"></div>
   </div>
   <div class="menu-grid">
-    <div class="menu-card menu-card-custom" onclick="openCustomModal()">
+    <div class="menu-card menu-card-custom" data-menu-id="sandwich-custom" onclick="openCustomModal()">
       <div class="card-img bg-custom">
         🛠
         <span class="card-badge">✨ Libre</span>
       </div>
+      <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
       <div class="card-body">
         <div class="card-name">Sandwich Personalizado</div>
         <div class="card-desc">Lienzo en blanco. Tú decides cada capa, pan y salsa desde cero.</div>
@@ -220,11 +230,12 @@
 </div>
 <div class="menu-grid">
 
-  <div class="menu-card" onclick="openPostreModal('Alfajor', 'Alfajor artesanal de maicena con manjar y coco.', 1000)">
+  <div class="menu-card" data-menu-id="postre-alfajor" onclick="openPostreModal('Alfajor', 'Alfajor artesanal de maicena con manjar y coco.', 1000)">
     <div class="card-img bg-postre-1">
       🍪
       <span class="card-badge">🍰 Postre</span>
     </div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
     <div class="card-body">
       <div class="card-name">Alfajor</div>
       <div class="card-desc">Alfajor artesanal...</div>
@@ -235,11 +246,12 @@
     </div>
   </div>
 
-  <div class="menu-card" onclick="openPostreModal('Cuchufli', 'Tres Cuchufli crocantes rellenos de manjar, bañados en chocolate.', 1000)">
+  <div class="menu-card" data-menu-id="postre-cuchufli" onclick="openPostreModal('Cuchufli', 'Tres Cuchufli crocantes rellenos de manjar, bañados en chocolate.', 1000)">
     <div class="card-img bg-postre-2">
       🍫
       <span class="card-badge">🍰 Postre</span>
     </div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
     <div class="card-body">
       <div class="card-name">🍫😋 Cuchufli</div>
       <div class="card-desc">Tres Cuchufli crocantes rellenos de manjar, bañados en chocolate.</div>
@@ -249,8 +261,72 @@
       </div>
     </div>
   </div>
+</div>
+
+<!--BEBIDAS-->
+<div class="section-divider">
+  <div class="section-pill">🥤 Bebidas</div>
+  <div class="divider-line"></div>
+</div>
+<div class="menu-grid">
+
+  <div class="menu-card" data-menu-id="bebida-agua" onclick="openBebidaModal('agua')">
+    <div class="card-img bg-1">💧<span class="card-badge">💧 Agua</span></div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
+    <div class="card-body">
+      <div class="card-name">Agua</div>
+      <div class="card-desc">Elige tu marca y tipo preferido.</div>
+      <div class="card-footer">
+        <span class="card-price">$700</span>
+        <button class="btn-customize">🥤 Elegir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-card" data-menu-id="bebida-jugo" onclick="openBebidaModal('jugo')">
+    <div class="card-img bg-2">🍊<span class="card-badge">🍊 Jugo</span></div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
+    <div class="card-body">
+      <div class="card-name">Jugo</div>
+      <div class="card-desc">Elige tu sabor y marca preferida.</div>
+      <div class="card-footer">
+        <span class="card-price">$700</span>
+        <button class="btn-customize">🥤 Elegir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-card" data-menu-id="bebida-cola" onclick="openBebidaModal('cola')">
+    <div class="card-img bg-3">🥤<span class="card-badge">🥤 Bebida</span></div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
+    <div class="card-body">
+      <div class="card-name">Bebida con azúcar</div>
+      <div class="card-desc">Elige tu marca y sabor.</div>
+      <div class="card-footer">
+        <span class="card-price">$1.200</span>
+        <button class="btn-customize">🥤 Elegir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-card" data-menu-id="bebida-zero" onclick="openBebidaModal('zero')">
+    <div class="card-img bg-postre-1">🫙<span class="card-badge">0️⃣ Sin azúcar</span></div>
+    <div class="card-agotado-badge" style="display:none">❌ Agotado</div>
+    <div class="card-body">
+      <div class="card-name">Bebida sin azúcar</div>
+      <div class="card-desc">Elige tu marca light o zero.</div>
+      <div class="card-footer">
+        <span class="card-price">$1.200</span>
+        <button class="btn-customize">🥤 Elegir</button>
+      </div>
+    </div>
+  </div>
 
 </div>
+
+</div>
+
+
 </section>
 
 
@@ -281,6 +357,12 @@
         <button class="pan-btn" data-pan="Árabe"     onclick="selectPan(this)">🫓 Pan árabe</button>
         <button class="pan-btn" data-pan="Integral"  onclick="selectPan(this)">🌾 Integral</button>
         <button class="pan-btn" data-pan="Brioche"   onclick="selectPan(this)">🍔 Brioche (+$300)</button>
+      </div>
+
+      <!-- Opciones de bebida (visible en modo-postre) -->
+      <div id="bebida-opciones" style="display:none">
+        <div class="ing-section-title" id="bebida-opciones-title">🥤 Elige tu opción</div>
+        <div class="ing-options" id="bebida-lista"></div>
       </div>
 
       <!-- Ingredientes base (incluidos) -->
@@ -354,7 +436,7 @@
 
 <!-- CTA (comentado en el original)
 <div class="cta-banner">
-  <h2>Primera orden: <u>envío gratis</u> con el código <strong>LAMIGA1</strong></h2>
+  <h2>Primera orden: <u>envío gratis</u> con el código <strong>FE1</strong></h2>
   <a href="#menu" class="btn-gold">🥪 Pedir ahora</a>
 </div> -->
 
@@ -378,16 +460,15 @@
     <ul>
       <li><a href="#">Nuestra historia</a></li>
       <li><a href="#">Proveedores</a></li>
-      <li><a href="#">Trabaja con nosotros</a></li>
     </ul>
   </div>
   <div>
     <h4>Contacto</h4>
     <ul>
-      <li><a href="#">📞 +56 9 8765 4321</a></li>
-      <li><a href="#">✉️ hola@lamiga.cl</a></li>
-      <li><a href="#">📍 Puerto Montt, Chile</a></li>
-      <li><a href="#">💬 WhatsApp</a></li>
+      <li><span class="footer-hours">📞 +56 9 8765 4321</span></li>
+      <li><span class="footer-hours">✉️ hola@FE.cl</span></li>
+      <li><span class="footer-hours">📍 Cerca de Egaña 398 (calle Esmeralda, carrito rojo), Puerto Montt, Los Lagos, Chile</span></li>
+      <li><span class="footer-hours">🕐 Lun–Vie · 07:00 – 19:00</span></li>
     </ul>
   </div>
   <div class="footer-bottom">
@@ -396,8 +477,26 @@
   </div>
 </footer>
 
+<!-- FAB WHATSAPP -->
+<a href="https://whatsapp.com/channel/AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" class="whatsapp-fab" title="Únete a nuestro canal de WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="26" height="26" fill="#F2CC85">
+    <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.67 4.88 1.93 7L2 30l7.26-1.9A13.93 13.93 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2Zm7.26 19.46c-.3.84-1.76 1.6-2.42 1.7-.62.09-1.4.13-2.26-.14-.52-.16-1.18-.38-2.04-.74-3.58-1.54-5.92-5.14-6.1-5.38-.18-.24-1.44-1.92-1.44-3.66s.91-2.6 1.24-2.96c.32-.36.7-.44.94-.44l.68.01c.22 0 .52-.08.8.62.3.72 1.04 2.54 1.13 2.72.1.18.16.4.03.64-.12.24-.18.38-.36.58-.18.2-.38.44-.54.6-.18.18-.37.38-.16.74.22.36.96 1.58 2.06 2.56 1.42 1.26 2.6 1.66 2.98 1.84.38.18.6.16.82-.1.22-.26.94-1.1 1.2-1.48.24-.36.48-.3.8-.18.32.12 2.04.96 2.38 1.14.36.18.6.26.68.42.1.14.1.84-.2 1.68Z"/>
+  </svg>
+</a>
 <!-- FAB CARRITO -->
 <a href="#" class="cart-fab" onclick="openCart(event)">🛒<span class="badge" id="cart-badge">0</span></a>
+
+<!-- BANNER CAMBIO DE TURNO -->
+<div id="shift-banner" style="display:none">
+  <div class="shift-banner-inner">
+    <div class="shift-banner-icon">⏳</div>
+    <div class="shift-banner-text">
+      <strong>Estamos en cambio de turno</strong>
+      <span id="shift-banner-msg">Los tiempos de espera pueden ser mayores de lo habitual. ¡Gracias por tu paciencia!</span>
+    </div>
+    <button class="shift-banner-close" onclick="document.getElementById('shift-banner').style.display='none'">✕</button>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -416,7 +515,7 @@
   </div>
 
   <div class="cart-body" id="cart-body">
-    <!-- items generados por JS -->
+    
   </div>
 
   <div class="cart-empty" id="cart-empty">
@@ -475,7 +574,7 @@
 
     <!-- Dirección (solo si delivery) -->
     <div class="pay-section" id="address-section">
-      <div class="pay-section-title">🏠 Dirección de entrega</div>
+      <div class="pay-section-title">🏠 Cerca de Egaña 398 (calle Esmeralda, carrito rojo), Puerto Montt, Los Lagos</div>
       <input class="pay-input" id="address-input" type="text" placeholder="Calle, número, depto.">
       <input class="pay-input" id="ref-input"  type="text" placeholder="Referencia (opcional)">
     </div>
@@ -631,6 +730,93 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════
+     MODAL AUTENTICACIÓN
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal" style="display:none">
+  <div class="modal auth-modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="auth-modal-title">Iniciar sesión</div>
+        <div class="modal-subtitle" id="auth-modal-sub">Accede a tu cuenta FE</div>
+      </div>
+      <button class="btn-close" onclick="closeAuthModal()">✕</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Crear cuenta</button>
+    </div>
+
+    <!-- FORM LOGIN -->
+    <div id="auth-form-login" class="auth-form">
+      <div class="auth-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Contraseña</label>
+        <div class="auth-pass-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+          <button class="btn-show-pass" onclick="togglePass('login-pass', this)">👁</button>
+        </div>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="btn-auth-submit" onclick="handleLogin()">Entrar →</button>
+    </div>
+
+    <!-- FORM REGISTRO -->
+    <div id="auth-form-register" class="auth-form" style="display:none">
+      <div class="auth-field">
+        <label>Nombre</label>
+        <input type="text" id="reg-name" placeholder="Tu nombre">
+      </div>
+      <div class="auth-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="reg-email" placeholder="tu@correo.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label>Contraseña</label>
+        <div class="auth-pass-wrap">
+          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          <button class="btn-show-pass" onclick="togglePass('reg-pass', this)">👁</button>
+        </div>
+        <div class="auth-pass-strength" id="pass-strength"></div>
+      </div>
+      <div class="auth-field">
+        <label>Confirmar contraseña</label>
+        <div class="auth-pass-wrap">
+          <input type="password" id="reg-pass2" placeholder="Repite tu contraseña" autocomplete="new-password">
+          <button class="btn-show-pass" onclick="togglePass('reg-pass2', this)">👁</button>
+        </div>
+      </div>
+      <div class="auth-error" id="register-error"></div>
+      <button class="btn-auth-submit" onclick="handleRegister()">Crear cuenta →</button>
+    </div>
+
+    <!-- ESTADO SESIÓN ACTIVA -->
+    <div id="auth-form-logged" class="auth-form" style="display:none">
+      <div class="auth-logged-info">
+        <div class="auth-avatar" id="auth-avatar">FE</div>
+        <div>
+          <div class="auth-logged-name" id="auth-logged-name">Usuario</div>
+          <div class="auth-logged-email" id="auth-logged-email">correo@fe.cl</div>
+        </div>
+      </div>
+      <div class="auth-session-info">
+        <span>⏱ Sesión activa</span>
+        <span id="session-countdown">15:00</span>
+      </div>
+      <div class="auth-security-note">
+        🔒 Las contraseñas se almacenan con cifrado SHA-256. Tu sesión expira automáticamente tras 15 minutos de inactividad.
+      </div>
+      <button class="btn-auth-submit btn-logout" onclick="handleLogout()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
 <script src="app.js"></script>
 </body>
 <!--       

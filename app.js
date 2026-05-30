@@ -35,19 +35,71 @@ const LAYER_COLORS = {
   '🍄':'#9b7040', '🧄':'#d4c070', '🥓':'#c84820',
 };
 
-const DELIVERY_COST = 1500;
+const DELIVERY_COST   = 1500;
+const INV_KEY         = 'fe_inventory';
+const MENU_INV_KEY    = 'fe_menu_inventory';
+const ORDERS_KEY      = 'fe_orders';
+const ORDER_READY_KEY = 'fe_order_ready';
+const SHIFT_KEY       = 'fe_shift_change';
+const OPEN_HOUR       = 7;
+const CLOSE_HOUR      = 19;
+
+// ── INVENTARIO ────────────────────────────────────────────────
+function getInventory() {
+  try {
+    const saved = localStorage.getItem(INV_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  const def = {};
+  [...EXTRAS, ...SAUCES].forEach(i => { def[i.id] = true; });
+  return def;
+}
+
+function isAvailable(id) {
+  const inv = getInventory();
+  return inv[id] !== false;
+}
+
+function getMenuInventory() {
+  try {
+    const saved = localStorage.getItem(MENU_INV_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return {};
+}
+
+function isMenuItemAvailable(id) {
+  const inv = getMenuInventory();
+  return inv[id] !== false;
+}
+
+function applyMenuAvailability() {
+  document.querySelectorAll('[data-menu-id]').forEach(card => {
+    const id    = card.dataset.menuId;
+    const avail = isMenuItemAvailable(id);
+    card.classList.toggle('card-agotado', !avail);
+    const badge = card.querySelector('.card-agotado-badge');
+    if (badge) badge.style.display = avail ? 'none' : 'flex';
+    const btn = card.querySelector('.btn-customize, .btn-customize-custom');
+    if (btn) {
+      btn.disabled = !avail;
+      if (!avail) btn.textContent = '❌ Agotado';
+    }
+  });
+}
 
 // ── STATE ─────────────────────────────────────────────────────
-let currentSandwich = null;
-let selectedExtras  = new Set();
-let selectedSauces  = new Set();
-let removedBaseIngs = new Set();   // índices de ingredientes base quitados
-let selectedPan     = 'Marraqueta';
-let qty             = 1;
-
-let cart = [];
+let currentSandwich    = null;
+let selectedExtras     = new Set();
+let selectedSauces     = new Set();
+let removedBaseIngs    = new Set();
+let selectedPan        = 'Marraqueta';
+let qty                = 1;
+let cart               = [];
 let selectedDelivery   = 'delivery';
 let selectedPayMethod  = 'transfer';
+let currentOrderNum    = null;
+let bebidaSeleccionada = null;
 
 // ── HELPERS ───────────────────────────────────────────────────
 const clp = n => '$' + n.toLocaleString('es-CL');
@@ -83,30 +135,34 @@ function closeModal() {
   document.getElementById('modal').classList.remove('open');
   document.querySelector('.modal').classList.remove('modo-postre');
   document.body.style.overflow = '';
+  // Ocultar y limpiar opciones de bebida
+  const wrap = document.getElementById('bebida-opciones');
+  const lista = document.getElementById('bebida-lista');
+  if (wrap)  wrap.style.display = 'none';
+  if (lista) lista.innerHTML = '';
+  bebidaSeleccionada = null;
 }
 
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target === document.getElementById('modal')) closeModal();
 });
 
-// ── RENDER: INGREDIENTES BASE (removibles) ────────────────────
+// ── RENDER: INGREDIENTES BASE ─────────────────────────────────
 function renderBaseIngs(ings) {
   const el = document.getElementById('base-ings');
   el.innerHTML = ings.map((ing, i) => {
     const removed = removedBaseIngs.has(i);
     return `
-    <div class="ing-option base-ing ${removed ? 'base-removed' : ''}"
-         onclick="toggleBaseIng(${i})">
+    <div class="ing-option base-ing ${removed ? 'base-removed' : ''}" onclick="toggleBaseIng(${i})">
       <div class="ing-left">
         <span class="ing-emoji" style="${removed ? 'opacity:.35;text-decoration:line-through' : ''}">${ing.split(' ')[0]}</span>
-        <span class="ing-name"  style="${removed ? 'opacity:.4;text-decoration:line-through' : ''}">${ing.split(' ').slice(1).join(' ')}</span>
+        <span class="ing-name"  style="${removed ? 'opacity:.4;text-decoration:line-through'  : ''}">${ing.split(' ').slice(1).join(' ')}</span>
       </div>
       ${removed
         ? `<span class="base-removed-badge">sin este ✕</span>`
-        : `<span class="base-quitar-hint">quitar ✕</span>`
-      }
-    </div>
-  `}).join('');
+        : `<span class="base-quitar-hint">quitar ✕</span>`}
+    </div>`;
+  }).join('');
 }
 
 function toggleBaseIng(index) {
@@ -118,44 +174,54 @@ function toggleBaseIng(index) {
 // ── RENDER: EXTRAS ────────────────────────────────────────────
 function renderExtras() {
   const el = document.getElementById('extra-ings');
-  el.innerHTML = EXTRAS.map(e => `
-    <div class="ing-option ${selectedExtras.has(e.id) ? 'selected' : ''}"
-         onclick="toggleExtra('${e.id}')">
+  el.innerHTML = EXTRAS.map(e => {
+    const avail    = isAvailable(e.id);
+    const selected = selectedExtras.has(e.id);
+    return `
+    <div class="ing-option ${selected ? 'selected' : ''} ${avail ? '' : 'ing-agotado'}"
+         onclick="${avail ? `toggleExtra('${e.id}')` : "showToast('❌ Este ingrediente está agotado.')"}">
       <div class="ing-left">
-        <span class="ing-emoji">${e.emoji}</span>
-        <span class="ing-name">${e.name}</span>
+        <span class="ing-emoji" style="${avail ? '' : 'opacity:.35;filter:grayscale(.8)'}">${e.emoji}</span>
+        <span class="ing-name"  style="${avail ? '' : 'opacity:.45;text-decoration:line-through'}">${e.name}</span>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-        <span class="ing-price">+${clp(e.price)}</span>
-        <div class="ing-check">✓</div>
+        ${avail
+          ? `<span class="ing-price">+${clp(e.price)}</span><div class="ing-check">✓</div>`
+          : `<span class="ing-stock-badge">Agotado</span>`}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── RENDER: SALSAS ────────────────────────────────────────────
 function renderSauces() {
   const el = document.getElementById('sauce-ings');
-  el.innerHTML = SAUCES.map(s => `
-    <div class="ing-option ${selectedSauces.has(s.id) ? 'selected' : ''}"
-         onclick="toggleSauce('${s.id}')">
+  el.innerHTML = SAUCES.map(s => {
+    const avail    = isAvailable(s.id);
+    const selected = selectedSauces.has(s.id);
+    return `
+    <div class="ing-option ${selected ? 'selected' : ''} ${avail ? '' : 'ing-agotado'}"
+         onclick="${avail ? `toggleSauce('${s.id}')` : "showToast('❌ Esta salsa está agotada.')"}">
       <div class="ing-left">
-        <span class="ing-emoji">${s.emoji}</span>
-        <span class="ing-name">${s.name}</span>
+        <span class="ing-emoji" style="${avail ? '' : 'opacity:.35;filter:grayscale(.8)'}">${s.emoji}</span>
+        <span class="ing-name"  style="${avail ? '' : 'opacity:.45;text-decoration:line-through'}">${s.name}</span>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-        <span class="ing-price">${s.price > 0 ? '+' + clp(s.price) : 'gratis'}</span>
-        <div class="ing-check">✓</div>
+        ${avail
+          ? `<span class="ing-price">${s.price > 0 ? '+' + clp(s.price) : 'gratis'}</span><div class="ing-check">✓</div>`
+          : `<span class="ing-stock-badge">Agotado</span>`}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleExtra(id) {
+  if (!isAvailable(id)) return;
   selectedExtras.has(id) ? selectedExtras.delete(id) : selectedExtras.add(id);
   renderExtras(); updatePreview(); updateTotal();
 }
 function toggleSauce(id) {
+  if (!isAvailable(id)) return;
   selectedSauces.has(id) ? selectedSauces.delete(id) : selectedSauces.add(id);
   renderSauces(); updateTotal();
 }
@@ -175,7 +241,7 @@ function updatePreview() {
   layers.push(`<div class="preview-layer adding" style="${panStyle}border-radius:50px 50px 6px 6px;">🍞 ${selectedPan} (arriba)</div>`);
 
   currentSandwich.baseIngs.forEach((ing, i) => {
-    if (removedBaseIngs.has(i)) return;   // omitir quitados
+    if (removedBaseIngs.has(i)) return;
     const emoji = ing.split(' ')[0];
     const name  = ing.split(' ').slice(1).join(' ');
     const bg    = LAYER_COLORS[emoji] || '#888';
@@ -216,31 +282,41 @@ function changeQty(d) {
 
 // ── AGREGAR AL CARRITO ────────────────────────────────────────
 function addToCart() {
-  const unitPrice = calcUnitPrice();
-  const extras    = [...selectedExtras].map(id => EXTRAS.find(e => e.id === id)).filter(Boolean);
-  const sauces    = [...selectedSauces].map(id => SAUCES.find(s => s.id === id)).filter(Boolean);
+  // Caso bebida
+  if (currentSandwich && currentSandwich.esBebida && bebidaSeleccionada) {
+    const unitPrice = bebidaSeleccionada.precio;
+    const key       = `bebida|${bebidaSeleccionada.id}`;
+    const existing  = cart.find(i => i.key === key);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({ key, id: Date.now(), name: bebidaSeleccionada.nombre,
+        emoji: bebidaSeleccionada.emoji, baseIngs: [], removedBaseIngs: [],
+        extras: [], sauces: [], pan: '—', unitPrice, qty });
+    }
+    updateCartBadge();
+    closeModal();
+    showToast(`${bebidaSeleccionada.emoji} ${qty}× ${bebidaSeleccionada.nombre} agregado`);
+    bebidaSeleccionada = null;
+    return;
+  }
+
+  // Caso sandwich/postre normal
+  const unitPrice    = calcUnitPrice();
+  const extras       = [...selectedExtras].map(id => EXTRAS.find(e => e.id === id)).filter(Boolean);
+  const sauces       = [...selectedSauces].map(id => SAUCES.find(s => s.id === id)).filter(Boolean);
   const removedNames = [...removedBaseIngs].map(i => currentSandwich.baseIngs[i]).filter(Boolean);
 
-  const key = `${currentSandwich.name}|${selectedPan}|${[...selectedExtras].sort().join(',')}|${[...selectedSauces].sort().join(',')}|${[...removedBaseIngs].sort().join(',')}`;
+  const key      = `${currentSandwich.name}|${selectedPan}|${[...selectedExtras].sort().join(',')}|${[...selectedSauces].sort().join(',')}|${[...removedBaseIngs].sort().join(',')}`;
   const existing = cart.find(i => i.key === key);
   if (existing) {
     existing.qty += qty;
   } else {
-    cart.push({
-      key,
-      id: Date.now(),
-      name: currentSandwich.name,
+    cart.push({ key, id: Date.now(), name: currentSandwich.name,
       emoji: currentSandwich.baseIngs.find((_, i) => !removedBaseIngs.has(i))?.split(' ')[0] || '🥪',
-      baseIngs: currentSandwich.baseIngs,
-      removedBaseIngs: removedNames,
-      extras,
-      sauces,
-      pan: selectedPan,
-      unitPrice,
-      qty,
-    });
+      baseIngs: currentSandwich.baseIngs, removedBaseIngs: removedNames,
+      extras, sauces, pan: selectedPan, unitPrice, qty });
   }
-
   updateCartBadge();
   closeModal();
   showToast(`🥪 ${qty}× ${currentSandwich.name} agregado`);
@@ -253,28 +329,97 @@ function openPostreModal(nombre, desc, precio) {
   selectedSauces  = new Set();
   removedBaseIngs = new Set();
   qty = 1;
-
   document.getElementById('modal-name').textContent = nombre;
   document.getElementById('modal-desc').textContent = desc;
-  document.getElementById('qty-num').textContent = '1';
+  document.getElementById('qty-num').textContent    = '1';
   updateTotal();
-
   document.querySelector('.modal').classList.add('modo-postre');
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
-// ── SANDWICH PERSONALIZADO ────────────────────────────────────
-function openCustomModal() {
-  openModal('🛠 Sandwich Personalizado', 'Arma tu sandwich desde cero. Elige todo lo que quieras.', [], 3000, 'bg-custom');
-  // Mostrar hint en la sección de ingredientes base
-  const baseEl = document.getElementById('base-ings');
-  baseEl.innerHTML = `<div style="font-size:.8rem;color:var(--gris);padding:.4rem .2rem;font-style:italic">
-    Este sandwich no trae ingredientes por defecto — agrega los que quieras en "Extras" 👇
-  </div>`;
+// ── BEBIDAS ───────────────────────────────────────────────────
+const BEBIDAS = {
+  agua: { titulo:'💧 Agua', opciones:[
+    { id:'cachantun-gas', nombre:'Cachantun con gas 500ml',   precio:800, emoji:'💧' },
+    { id:'benedictino',   nombre:'Benedictino sin gas 500ml', precio:700, emoji:'🫧' },
+    { id:'vital',         nombre:'Vital sin gas 500ml',       precio:700, emoji:'💧' },
+  ]},
+  jugo: { titulo:'🍊 Jugo', opciones:[
+    { id:'watts-naranja', nombre:'Watts Naranja 200ml',  precio:700, emoji:'🍊' },
+    { id:'watts-durazno', nombre:'Watts Durazno 200ml',  precio:700, emoji:'🍑' },
+    { id:'watts-pera',    nombre:'Watts Pera 200ml',     precio:700, emoji:'🍐' },
+    { id:'ades-manzana',  nombre:'Ades Manzana 200ml',   precio:800, emoji:'🍎' },
+  ]},
+  cola: { titulo:'🥤 Bebida con azúcar', opciones:[
+    { id:'cocacola', nombre:'Coca-Cola 350ml',      precio:1200, emoji:'🥤' },
+    { id:'sprite',   nombre:'Sprite 350ml',         precio:1200, emoji:'🟢' },
+    { id:'fanta',    nombre:'Fanta Naranja 350ml',  precio:1200, emoji:'🟠' },
+    { id:'pepsi',    nombre:'Pepsi 350ml',          precio:1100, emoji:'🔵' },
+  ]},
+  zero: { titulo:'🫙 Bebida sin azúcar', opciones:[
+    { id:'cocacola-zero', nombre:'Coca-Cola Zero 350ml', precio:1200, emoji:'⚫' },
+    { id:'sprite-zero',   nombre:'Sprite Zero 350ml',    precio:1200, emoji:'🟩' },
+    { id:'pepsi-black',   nombre:'Pepsi Black 350ml',    precio:1200, emoji:'🔵' },
+  ]},
+};
+
+function openBebidaModal(tipo) {
+  const bebida = BEBIDAS[tipo];
+  if (!bebida) return;
+  currentSandwich = { name: bebida.titulo, desc:'Selecciona tu opción preferida:',
+    baseIngs:[], basePrice:0, esBebida:true, opciones:bebida.opciones };
+  selectedExtras = new Set(); selectedSauces = new Set(); removedBaseIngs = new Set();
+  qty = 1;
+
+  document.getElementById('modal-name').textContent = bebida.titulo;
+  document.getElementById('modal-desc').textContent = 'Selecciona tu opción preferida:';
+  document.getElementById('qty-num').textContent    = '1';
+
+  // Activar modo-postre (oculta pan, extras, salsas, preview)
+  document.querySelector('.modal').classList.add('modo-postre');
+
+  // Mostrar contenedor de bebidas (está fuera de las secciones ocultas)
+  const wrap = document.getElementById('bebida-opciones');
+  const lista = document.getElementById('bebida-lista');
+  if (wrap) wrap.style.display = 'block';
+  if (lista) {
+    lista.innerHTML = bebida.opciones.map(op => `
+      <div class="ing-option bebida-opcion" id="bop-${op.id}" onclick="seleccionarBebida('${tipo}','${op.id}')">
+        <div class="ing-left">
+          <span class="ing-emoji">${op.emoji}</span>
+          <span class="ing-name">${op.nombre}</span>
+        </div>
+        <span class="ing-price">$${op.precio.toLocaleString('es-CL')}</span>
+      </div>`).join('');
+  }
+
+  seleccionarBebida(tipo, bebida.opciones[0].id);
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-// ── CARRITO PANEL ─────────────────────────────────────────────
+function seleccionarBebida(tipo, id) {
+  const op = BEBIDAS[tipo]?.opciones.find(o => o.id === id);
+  if (!op) return;
+  bebidaSeleccionada = { tipo, ...op };
+  currentSandwich.basePrice = op.precio;
+  document.querySelectorAll('.bebida-opcion').forEach(el => el.classList.remove('selected'));
+  const el = document.getElementById('bop-' + id);
+  if (el) el.classList.add('selected');
+  updateTotal();
+}
+
+// ── SANDWICH PERSONALIZADO ────────────────────────────────────
+function openCustomModal() {
+  openModal('🛠 Sandwich Personalizado', 'Arma tu sandwich desde cero.', [], 3000, 'bg-custom');
+  document.getElementById('base-ings').innerHTML = `
+    <div style="font-size:.8rem;color:var(--gris);padding:.4rem .2rem;font-style:italic">
+      Este sandwich no trae ingredientes por defecto — agrega los que quieras en "Extras" 👇
+    </div>`;
+}
+
+// ── CARRITO ───────────────────────────────────────────────────
 function openCart(e) {
   e && e.preventDefault();
   renderCartPanel();
@@ -321,16 +466,15 @@ function renderCartPanel() {
             <div class="cart-item-price">${clp(item.unitPrice * item.qty)}</div>
             <div style="display:flex;align-items:center;gap:.6rem">
               <div class="cart-item-qty">
-                <button class="cart-qty-btn" onclick="changeCartQty(${item.id}, -1)">−</button>
+                <button class="cart-qty-btn" onclick="changeCartQty(${item.id},-1)">−</button>
                 <span class="cart-qty-num">${item.qty}</span>
-                <button class="cart-qty-btn" onclick="changeCartQty(${item.id}, 1)">+</button>
+                <button class="cart-qty-btn" onclick="changeCartQty(${item.id},1)">+</button>
               </div>
               <button class="cart-remove-btn" onclick="removeCartItem(${item.id})">🗑</button>
             </div>
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 
   updateCartTotals();
@@ -350,17 +494,15 @@ function removeCartItem(id) {
 }
 
 function updateCartBadge() {
-  const total = cart.reduce((acc, i) => acc + i.qty, 0);
-  document.getElementById('cart-badge').textContent = total;
+  document.getElementById('cart-badge').textContent = cart.reduce((acc,i) => acc + i.qty, 0);
 }
 
 function updateCartTotals() {
-  const subtotal = cart.reduce((acc, i) => acc + i.unitPrice * i.qty, 0);
+  const subtotal = cart.reduce((acc,i) => acc + i.unitPrice * i.qty, 0);
   const delivery = selectedDelivery === 'pickup' ? 0 : DELIVERY_COST;
-  const total    = subtotal + delivery;
-  document.getElementById('cart-subtotal-val').textContent  = clp(subtotal);
-  document.getElementById('cart-delivery-val').textContent  = delivery > 0 ? clp(delivery) : 'Gratis';
-  document.getElementById('cart-total-val').textContent     = clp(total);
+  document.getElementById('cart-subtotal-val').textContent = clp(subtotal);
+  document.getElementById('cart-delivery-val').textContent = delivery > 0 ? clp(delivery) : 'Gratis';
+  document.getElementById('cart-total-val').textContent    = clp(subtotal + delivery);
 }
 
 // ── PAGO ──────────────────────────────────────────────────────
@@ -383,8 +525,7 @@ function selectDelivery(type) {
   selectedDelivery = type;
   document.querySelectorAll('.delivery-opt').forEach(el => el.classList.remove('selected'));
   document.getElementById('opt-' + type).classList.add('selected');
-  const addrSection = document.getElementById('address-section');
-  addrSection.style.display = type === 'delivery' ? 'block' : 'none';
+  document.getElementById('address-section').style.display = type === 'delivery' ? 'block' : 'none';
   updateCartTotals();
   renderPaySummary();
 }
@@ -400,24 +541,49 @@ function selectPayMethod(method) {
 }
 
 function renderPaySummary() {
-  const subtotal = cart.reduce((acc, i) => acc + i.unitPrice * i.qty, 0);
+  const subtotal = cart.reduce((acc,i) => acc + i.unitPrice * i.qty, 0);
   const delivery = selectedDelivery === 'pickup' ? 0 : DELIVERY_COST;
-  const total    = subtotal + delivery;
-
-  const rows = cart.map(item => `
+  const rows     = cart.map(item => `
     <div class="pay-sum-item">
       <span class="pay-sum-name">${item.qty}× ${item.name}</span>
       <span>${clp(item.unitPrice * item.qty)}</span>
-    </div>
-  `).join('');
-
+    </div>`).join('');
   document.getElementById('pay-summary').innerHTML = rows + `
     <div class="pay-sum-item">
       <span class="pay-sum-name">Envío</span>
       <span>${delivery > 0 ? clp(delivery) : 'Gratis'}</span>
-    </div>
-  `;
-  document.getElementById('pay-total-display').textContent = clp(total);
+    </div>`;
+  document.getElementById('pay-total-display').textContent = clp(subtotal + delivery);
+}
+
+// ── PEDIDOS ───────────────────────────────────────────────────
+function saveOrderToStorage(orderNum, orderData) {
+  try {
+    const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]');
+    orders.unshift({ ...orderData, num: orderNum, status:'pending', createdAt: new Date().toISOString() });
+    if (orders.length > 50) orders.splice(50);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  } catch(e) { console.error('Error guardando pedido', e); }
+}
+
+function showOrderReadyBanner(num) {
+  const prev = document.getElementById('order-ready-banner');
+  if (prev) prev.remove();
+  const banner = document.createElement('div');
+  banner.id = 'order-ready-banner';
+  banner.innerHTML = `
+    <div class="orb-inner">
+      <div class="orb-icon">🔔</div>
+      <div class="orb-text">
+        <strong>¡Tu pedido ${num} está listo!</strong>
+        <span>${selectedDelivery === 'pickup' ? '¡Pasa a retirarlo al local! 🏪' : '¡Ya va en camino! 🛵'}</span>
+      </div>
+      <button class="orb-close" onclick="this.closest('#order-ready-banner').remove()">✕</button>
+    </div>`;
+  document.body.appendChild(banner);
+  setTimeout(() => { if (banner.parentNode) banner.remove(); }, 30000);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  showToast('🔔 ¡Tu pedido está listo!');
 }
 
 // ── CONFIRMAR PEDIDO ──────────────────────────────────────────
@@ -425,45 +591,42 @@ function confirmOrder() {
   document.getElementById('payment-overlay').style.display = 'none';
 
   const orderNum  = '#' + String(Math.floor(Math.random() * 9000) + 1000);
-  const subtotal  = cart.reduce((acc, i) => acc + i.unitPrice * i.qty, 0);
-  const delivery  = selectedDelivery === 'pickup' ? 0 : DELIVERY_COST;
-  const total     = subtotal + delivery;
+  currentOrderNum = orderNum;
 
-  const payLabels = {
-    transfer: 'Transferencia bancaria',
-    card: 'Tarjeta débito/crédito',
-    cash: 'Efectivo',
-    mercadopago: 'Mercado Pago',
-  };
-  const deliveryLabels = { delivery: '🛵 Delivery (30–45 min)', pickup: '🏪 Retiro en local (15–20 min)' };
+  const subtotal = cart.reduce((acc,i) => acc + i.unitPrice * i.qty, 0);
+  const delivery = selectedDelivery === 'pickup' ? 0 : DELIVERY_COST;
+  const total    = subtotal + delivery;
+
+  saveOrderToStorage(orderNum, {
+    items: cart.map(i => ({
+      name:i.name, emoji:i.emoji, qty:i.qty, pan:i.pan,
+      extras:i.extras.map(e => e.name), sauces:i.sauces.map(s => s.name),
+      removedBaseIngs:i.removedBaseIngs||[], unitPrice:i.unitPrice,
+    })),
+    delivery:selectedDelivery, payMethod:selectedPayMethod,
+    subtotal, deliveryCost:delivery, total,
+  });
+
+  const shiftState = getShiftState();
+  const extraMin   = (shiftState?.active) ? (shiftState.extraMinutes || 20) : 0;
+  document.getElementById('eta-time').textContent = selectedDelivery === 'pickup'
+    ? `${15+extraMin}–${20+extraMin} min`
+    : `${30+extraMin}–${45+extraMin} min`;
+
+  const payLabels      = { transfer:'Transferencia bancaria', card:'Tarjeta débito/crédito', cash:'Efectivo', mercadopago:'Mercado Pago' };
+  const deliveryLabels = { delivery:'🛵 Delivery (30–45 min)', pickup:'🏪 Retiro en local (15–20 min)' };
 
   document.getElementById('confirm-order-num').textContent = orderNum;
-  document.getElementById('eta-time').textContent = selectedDelivery === 'pickup' ? '15–20 min' : '30–45 min';
-
   document.getElementById('confirm-details').innerHTML = `
-    <div class="confirm-detail-row">
-      <span class="confirm-detail-label">Entrega</span>
-      <span class="confirm-detail-val">${deliveryLabels[selectedDelivery]}</span>
-    </div>
-    <div class="confirm-detail-row">
-      <span class="confirm-detail-label">Pago</span>
-      <span class="confirm-detail-val">${payLabels[selectedPayMethod]}</span>
-    </div>
-    <div class="confirm-detail-row">
-      <span class="confirm-detail-label">Items</span>
-      <span class="confirm-detail-val">${cart.reduce((a,i) => a + i.qty, 0)} productos</span>
-    </div>
-    <div class="confirm-detail-row">
-      <span class="confirm-detail-label">Total</span>
-      <span class="confirm-detail-val">${clp(total)}</span>
-    </div>
-  `;
+    <div class="confirm-detail-row"><span class="confirm-detail-label">Entrega</span><span class="confirm-detail-val">${deliveryLabels[selectedDelivery]}</span></div>
+    <div class="confirm-detail-row"><span class="confirm-detail-label">Pago</span><span class="confirm-detail-val">${payLabels[selectedPayMethod]}</span></div>
+    <div class="confirm-detail-row"><span class="confirm-detail-label">Items</span><span class="confirm-detail-val">${cart.reduce((a,i)=>a+i.qty,0)} productos</span></div>
+    <div class="confirm-detail-row"><span class="confirm-detail-label">Total</span><span class="confirm-detail-val">${clp(total)}</span></div>`;
 
   const overlay = document.getElementById('confirm-overlay');
   overlay.style.display = 'block';
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
-
   animateOrderSteps();
 }
 
@@ -482,7 +645,7 @@ function backToMenu() {
   updateCartBadge();
   document.getElementById('confirm-overlay').style.display = 'none';
   document.body.style.overflow = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top:0, behavior:'smooth' });
   showToast('¡Gracias por tu pedido! 🎉');
 }
 
@@ -494,18 +657,87 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// ── HORARIO ───────────────────────────────────────────────────
+function isWithinHours() {
+  const now = new Date();
+  const h   = now.getHours() + now.getMinutes() / 60;
+  return h >= OPEN_HOUR && h < CLOSE_HOUR;
+}
+
+function updateScheduleBadge() {
+  const dot  = document.getElementById('hero-schedule-dot');
+  const text = document.getElementById('hero-schedule-text');
+  if (!dot || !text) return;
+  const open = isWithinHours();
+  dot.style.background = open ? '#A67A44' : '#593B2A';
+  text.textContent = open
+    ? '● Abierto ahora · Lun–Vie 07:00–19:00'
+    : '● Cerrado · Abrimos Lun–Vie 07:00–19:00';
+  text.style.color = open ? '#A67A44' : '#593B2A';
+}
+
+function getShiftState() {
+  try {
+    const raw = localStorage.getItem(SHIFT_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data.expiresAt && Date.now() > data.expiresAt) {
+      localStorage.removeItem(SHIFT_KEY);
+      return null;
+    }
+    return data;
+  } catch { return null; }
+}
+
+function checkShiftChange() {
+  const shift  = getShiftState();
+  const banner = document.getElementById('shift-banner');
+  if (!banner) return;
+  if (shift?.active) {
+    const msg = document.getElementById('shift-banner-msg');
+    if (msg) msg.textContent = `Estamos organizando el turno. Los tiempos de espera pueden ser de hasta ${shift.extraMinutes || 20} min adicionales. ¡Gracias por tu paciencia!`;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ── STORAGE LISTENER (único) ──────────────────────────────────
+window.addEventListener('storage', e => {
+  switch (e.key) {
+    case INV_KEY:
+      if (document.getElementById('modal').classList.contains('open')) {
+        renderExtras();
+        renderSauces();
+      }
+      break;
+    case MENU_INV_KEY:
+      applyMenuAvailability();
+      break;
+    case SHIFT_KEY:
+      checkShiftChange();
+      updateScheduleBadge();
+      break;
+    case ORDER_READY_KEY:
+      if (e.newValue) {
+        try {
+          const data = JSON.parse(e.newValue);
+          if (data.num === currentOrderNum) showOrderReadyBanner(data.num);
+        } catch {}
+      }
+      break;
+  }
+});
+
 // ── SCROLL ANIMATIONS ─────────────────────────────────────────
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.animationPlayState = 'running';
-      obs.unobserve(e.target);
-    }
+    if (e.isIntersecting) { e.target.style.animationPlayState = 'running'; obs.unobserve(e.target); }
   });
 }, { threshold: 0.1 });
 document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
-// Formateo tarjeta
+// ── FORMATEO TARJETA ──────────────────────────────────────────
 document.addEventListener('input', e => {
   if (e.target.id === 'card-num') {
     e.target.value = e.target.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);
@@ -516,3 +748,11 @@ document.addEventListener('input', e => {
     e.target.value = v;
   }
 });
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  applyMenuAvailability();
+  checkShiftChange();
+  updateScheduleBadge();
+});
+setInterval(() => { updateScheduleBadge(); checkShiftChange(); }, 60000);
