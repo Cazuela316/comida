@@ -186,6 +186,33 @@
     </div>
   </div>
 
+  <!--MENU PERSONALIZADO-->
+  <div class="section-divider">
+    <div class="section-pill">🛠 Arma el tuyo</div>
+    <div class="divider-line"></div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-card menu-card-custom" onclick="openCustomModal()">
+      <div class="card-img bg-custom">
+        🛠
+        <span class="card-badge">✨ Libre</span>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Sandwich Personalizado</div>
+        <div class="card-desc">Lienzo en blanco. Tú decides cada capa, pan y salsa desde cero.</div>
+        <div class="card-ingredients">
+          <span class="ing-tag">🍞 Pan a elegir</span>
+          <span class="ing-tag">➕ Todo extra</span>
+          <span class="ing-tag">🧴 Salsas libres</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-price">$3.000</span>
+          <button class="btn-customize btn-customize-custom">🛠 Personalizar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!--MENU POSTRES-->
 <div class="section-divider">
   <div class="section-pill">🍰 Postres</div>
@@ -370,10 +397,239 @@
 </footer>
 
 <!-- FAB CARRITO -->
-<a href="#" class="cart-fab">🛒<span class="badge" id="cart-badge">0</span></a>
+<a href="#" class="cart-fab" onclick="openCart(event)">🛒<span class="badge" id="cart-badge">0</span></a>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════════════════
+     PANEL CARRITO
+════════════════════════════════════════════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<aside class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <div>
+      <div class="cart-header-label">Tu pedido</div>
+      <h2 class="cart-header-title">Carrito 🛒</h2>
+    </div>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+
+  <div class="cart-body" id="cart-body">
+    <!-- items generados por JS -->
+  </div>
+
+  <div class="cart-empty" id="cart-empty">
+    <div class="cart-empty-icon">🥪</div>
+    <p>Tu carrito está vacío</p>
+    <span>Agrega un sandwich del menú para empezar</span>
+  </div>
+
+  <div class="cart-footer" id="cart-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <span id="cart-subtotal-val">$0</span>
+    </div>
+    <div class="cart-subtotal" style="color:var(--gris);font-size:.82rem">
+      <span>Envío</span>
+      <span id="cart-delivery-val">$1.500</span>
+    </div>
+    <div class="cart-total-row">
+      <span>Total</span>
+      <span id="cart-total-val">$0</span>
+    </div>
+    <button class="btn-checkout" onclick="openPayment()">💳 Ir a pagar</button>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════════
+     PANEL PAGO
+════════════════════════════════════════════ -->
+<div class="screen-overlay" id="payment-overlay">
+  <div class="payment-screen" id="payment-screen">
+    <div class="payment-header">
+      <button class="back-btn" onclick="closePayment()">← Volver</button>
+      <h2 class="payment-title">¿Cómo pagás?</h2>
+    </div>
+
+    <!-- Método de entrega -->
+    <div class="pay-section">
+      <div class="pay-section-title">📍 Método de entrega</div>
+      <div class="delivery-options">
+        <div class="delivery-opt selected" id="opt-delivery" onclick="selectDelivery('delivery')">
+          <span class="delivery-opt-icon">🛵</span>
+          <div>
+            <div class="delivery-opt-name">Delivery</div>
+            <div class="delivery-opt-desc">30–45 min · $1.500</div>
+          </div>
+        </div>
+        <div class="delivery-opt" id="opt-pickup" onclick="selectDelivery('pickup')">
+          <span class="delivery-opt-icon">🏪</span>
+          <div>
+            <div class="delivery-opt-name">Retiro en local</div>
+            <div class="delivery-opt-desc">15–20 min · Gratis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dirección (solo si delivery) -->
+    <div class="pay-section" id="address-section">
+      <div class="pay-section-title">🏠 Dirección de entrega</div>
+      <input class="pay-input" id="address-input" type="text" placeholder="Calle, número, depto.">
+      <input class="pay-input" id="ref-input"  type="text" placeholder="Referencia (opcional)">
+    </div>
+
+    <!-- Método de pago -->
+    <div class="pay-section">
+      <div class="pay-section-title">💳 Método de pago</div>
+      <div class="pay-methods">
+
+        <div class="pay-method selected" id="pm-transfer" onclick="selectPayMethod('transfer')">
+          <div class="pm-icon">🏦</div>
+          <div>
+            <div class="pm-name">Transferencia</div>
+            <div class="pm-desc">Banco / RUT</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </div>
+
+        <div class="pay-method" id="pm-card" onclick="selectPayMethod('card')">
+          <div class="pm-icon">💳</div>
+          <div>
+            <div class="pm-name">Tarjeta</div>
+            <div class="pm-desc">Débito / Crédito</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </div>
+
+        <div class="pay-method" id="pm-cash" onclick="selectPayMethod('cash')">
+          <div class="pm-icon">💵</div>
+          <div>
+            <div class="pm-name">Efectivo</div>
+            <div class="pm-desc">Paga al recibir</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </div>
+
+        <div class="pay-method" id="pm-mercadopago" onclick="selectPayMethod('mercadopago')">
+          <div class="pm-icon">🔵</div>
+          <div>
+            <div class="pm-name">Mercado Pago</div>
+            <div class="pm-desc">Paga por app</div>
+          </div>
+          <div class="pm-check">✓</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Detalle método seleccionado -->
+    <div class="pay-detail" id="pay-detail-transfer">
+      <div class="transfer-box">
+        <div class="transfer-row"><span>Banco</span><strong>BCI</strong></div>
+        <div class="transfer-row"><span>RUT</span><strong>12.345.678-9</strong></div>
+        <div class="transfer-row"><span>Titular</span><strong>FE Sandwichería</strong></div>
+        <div class="transfer-row"><span>Tipo</span><strong>Cuenta corriente</strong></div>
+        <div class="transfer-note">📧 Envía el comprobante a <strong>pagos@fe.cl</strong> para confirmar tu pedido</div>
+      </div>
+    </div>
+
+    <div class="pay-detail" id="pay-detail-card" style="display:none">
+      <div class="card-form">
+        <input class="pay-input" type="text" placeholder="Número de tarjeta" maxlength="19" id="card-num">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">
+          <input class="pay-input" type="text" placeholder="MM/AA" maxlength="5" id="card-exp">
+          <input class="pay-input" type="text" placeholder="CVV" maxlength="3" id="card-cvv">
+        </div>
+        <input class="pay-input" type="text" placeholder="Nombre en la tarjeta">
+      </div>
+    </div>
+
+    <div class="pay-detail" id="pay-detail-cash" style="display:none">
+      <div class="cash-note">
+        💵 Pago al momento de la entrega.<br>
+        <span>¿Con cuánto pagas? (opcional)</span>
+        <input class="pay-input" type="number" placeholder="Ej: $5.000" style="margin-top:.6rem">
+      </div>
+    </div>
+
+    <div class="pay-detail" id="pay-detail-mercadopago" style="display:none">
+      <div class="mp-box">
+        <div class="mp-qr">QR</div>
+        <p>Abre Mercado Pago y escanea el código o usa el link:</p>
+        <a class="mp-link" href="#">🔗 Pagar con Mercado Pago</a>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="pay-section">
+      <div class="pay-section-title">🧾 Resumen</div>
+      <div class="pay-summary" id="pay-summary"></div>
+    </div>
+
+    <div class="pay-footer">
+      <div class="pay-total-row">
+        <span>Total a pagar</span>
+        <span id="pay-total-display">$0</span>
+      </div>
+      <button class="btn-confirm-pay" onclick="confirmOrder()">✅ Confirmar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PANTALLA CONFIRMACIÓN
+════════════════════════════════════════════ -->
+<div class="screen-overlay" id="confirm-overlay" style="display:none">
+  <div class="confirm-screen">
+    <div class="confirm-animation">
+      <div class="confirm-circle">
+        <span class="confirm-check">✓</span>
+      </div>
+    </div>
+    <h2 class="confirm-title">¡Pedido confirmado!</h2>
+    <p class="confirm-subtitle">Tu sandwich está en camino 🥪🔥</p>
+
+    <div class="confirm-order-num">
+      Pedido <strong id="confirm-order-num">#0000</strong>
+    </div>
+
+    <div class="confirm-details" id="confirm-details"></div>
+
+    <div class="confirm-eta">
+      <div class="eta-icon">⏱</div>
+      <div>
+        <div class="eta-label">Tiempo estimado</div>
+        <div class="eta-time" id="eta-time">30–45 min</div>
+      </div>
+    </div>
+
+    <div class="confirm-steps">
+      <div class="cstep active" id="cstep-1">
+        <div class="cstep-dot"></div>
+        <div class="cstep-label">Pedido recibido</div>
+      </div>
+      <div class="cstep-line"></div>
+      <div class="cstep" id="cstep-2">
+        <div class="cstep-dot"></div>
+        <div class="cstep-label">Preparando</div>
+      </div>
+      <div class="cstep-line"></div>
+      <div class="cstep" id="cstep-3">
+        <div class="cstep-dot"></div>
+        <div class="cstep-label">En camino</div>
+      </div>
+      <div class="cstep-line"></div>
+      <div class="cstep" id="cstep-4">
+        <div class="cstep-dot"></div>
+        <div class="cstep-label">Entregado</div>
+      </div>
+    </div>
+
+    <button class="btn-back-menu" onclick="backToMenu()">🏠 Volver al menú</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
