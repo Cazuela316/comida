@@ -17,7 +17,22 @@
     <li><a href="#como-funciona">Cómo funciona</a></li>
     <li><a href="#" class="btn-nav btn-login-nav" onclick="openAuthModal(event)" id="nav-auth-btn">👤 Iniciar sesión</a></li>
   </ul>
+  <!-- Botón hamburguesa (solo móvil) -->
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menú" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- DRAWER MÓVIL -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="nav-drawer-panel">
+    <a href="#menu" onclick="closeDrawer()">🥪 Menú</a>
+    <a href="#como-funciona" onclick="closeDrawer()">❓ Cómo funciona</a>
+    <div class="nav-drawer-divider"></div>
+    <a href="#" class="btn-nav btn-login-nav" id="nav-auth-btn-mobile" onclick="openAuthModal(event); closeDrawer()">👤 Iniciar sesión</a>
+  </div>
+</div>
 
 <!-- HERO --><!-- Wow estamos mejorando! sigamos asi! -->
 <section class="hero">
@@ -818,7 +833,33 @@
 
 <script src="auth.js"></script>
 <script src="app.js"></script>
-</body>
+<script>
+/* ── NAV DRAWER (móvil) ─────────────────────────────── */
+function toggleDrawer() {
+  const drawer = document.getElementById('nav-drawer');
+  const btn    = document.getElementById('nav-hamburger');
+  const open   = drawer.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('nav-hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Sincronizar texto del botón móvil con el desktop
+const _origUpdateNav = updateNavAuth;
+updateNavAuth = function(session) {
+  _origUpdateNav(session);
+  const mobileBtn = document.getElementById('nav-auth-btn-mobile');
+  if (!mobileBtn) return;
+  if (session) {
+    mobileBtn.textContent = `👤 ${session.name || session.email.slice(0,2).toUpperCase()}`;
+  } else {
+    mobileBtn.textContent = '👤 Iniciar sesión';
+  }
+};
+</script>
 <!--       
 
                                   ###########
