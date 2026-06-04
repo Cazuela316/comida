@@ -938,6 +938,7 @@
     <button class="filter-btn" data-filter="extras" onclick="setFilter('extras', this)">🍖 Extras</button>
     <button class="filter-btn" data-filter="sauces" onclick="setFilter('sauces', this)">🥫 Salsas</button>
     <button class="filter-btn" data-filter="postre" onclick="setFilter('postre', this)">🍰 Postres</button>
+    <button class="filter-btn" data-filter="bebida" onclick="setFilter('bebida', this)">🥤 Bebidas</button>
     <input class="search-box" id="search-input" placeholder="🔍 Buscar..." oninput="renderAll()">
   </div>
 
@@ -947,6 +948,8 @@
     <button class="bulk-btn danger" onclick="setAll(false)">❌ Ingredientes: todo agotado</button>
     <button class="bulk-btn" onclick="setAllMenu(true)">✅ Platos: todo disponible</button>
     <button class="bulk-btn danger" onclick="setAllMenu(false)">❌ Platos: todo agotado</button>
+    <button class="bulk-btn" onclick="setCategoryMenu('bebida', true)">✅ Bebidas: todo disponible</button>
+    <button class="bulk-btn danger" onclick="setCategoryMenu('bebida', false)">❌ Bebidas: todo agotado</button>
   </div>
 
   <!-- MENÚ: SANDWICHES Y POSTRES -->
@@ -992,6 +995,29 @@
 <div id="admin-toast"></div>
 
 <script>
+/* ══════════════════════════════════════════
+   GUARDIA DE SESIÓN ADMIN
+══════════════════════════════════════════ */
+(function() {
+  let blocked = false;
+  try {
+    const s = JSON.parse(localStorage.getItem('fe_session'));
+    if (!s || s.expire <= Date.now() || !s.isAdmin) blocked = true;
+  } catch(e) {
+    blocked = true;
+  }
+  if (blocked) {
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0f0e0c;font-family:'DM Sans',sans-serif;color:#f0ead8;gap:1rem;text-align:center;padding:2rem">
+        <div style="font-size:3rem">🔒</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;color:#d4a843">Acceso restringido</div>
+        <div style="color:#7a7060;max-width:320px">Necesitas iniciar sesión con una cuenta de administrador para acceder a este panel.</div>
+        <a href="index.html" style="margin-top:.5rem;background:#d4a843;color:#000;padding:.6rem 1.4rem;border-radius:10px;text-decoration:none;font-weight:600">← Volver al sitio</a>
+      </div>`;
+    document.querySelectorAll('script:not([src])').forEach(s => s.remove());
+  }
+})();
+
 /* ══════════════════════════════════════════
    DATA — espejada con app.js
 ══════════════════════════════════════════ */
@@ -1163,7 +1189,7 @@ const CATEGORY_LABELS = {
 
 function renderMenuGrid() {
   const search = document.getElementById('search-input').value.toLowerCase();
-  const categories = ['huevo','mechada','custom','postre'];
+  const categories = ['huevo','mechada','custom','postre','bebida'];
   const container  = document.getElementById('menu-catalog-sections');
   container.innerHTML = '';
 
@@ -1173,6 +1199,7 @@ function renderMenuGrid() {
     if (currentFilter === 'available') items = items.filter(i => menuInventory[i.id]);
     if (currentFilter === 'agotado')   items = items.filter(i => !menuInventory[i.id]);
     if (currentFilter === 'postre' && cat !== 'postre') return;
+    if (currentFilter === 'bebida' && cat !== 'bebida') return;
     if (currentFilter === 'extras' || currentFilter === 'sauces') return;
     if (!items.length) return;
 
@@ -1210,6 +1237,17 @@ function renderMenuGrid() {
     `;
     container.appendChild(section);
   });
+}
+
+function setCategoryMenu(cat, value) {
+  MENU_ITEMS.filter(i => i.category === cat).forEach(i => { menuInventory[i.id] = value; });
+  saveMenuInventory();
+  changesCount++;
+  updateStats();
+  renderMenuGrid();
+  const catLabel = CATEGORY_LABELS[cat] || cat;
+  showAdminToast(`${catLabel}: todos ${value ? '✅ disponibles' : '❌ agotados'}`);
+  logMenuChange('CAT_' + cat.toUpperCase(), value);
 }
 
 /* ══════════════════════════════════════════

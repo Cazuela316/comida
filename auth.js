@@ -29,7 +29,9 @@ function saveUsers(users) {
 /* ── SESIÓN  ──────────────────────────────────────────── */
 function saveSession(user) {
   const expire = Date.now() + TIMEOUT_MS;
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ email: user.email, name: user.name, expire }));
+  const data = { email: user.email, name: user.name, expire };
+  if (user.isAdmin) data.isAdmin = true;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(data));
   sessionExpireAt = expire;
 }
 function clearSession() {
@@ -158,6 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Crear cuenta admin si no existe
+  ensureAdminAccount();
+
   // Verificar sesión al cargar
   const session = getSession();
   if (session) {
@@ -180,6 +185,29 @@ function updateNavAuth(session) {
   }
 }
 
+/* ── CUENTA ADMIN ────────────────────────────────────────────── */
+const ADMIN_KEY   = 'fe_admin';
+const ADMIN_EMAIL = 'admin@fe.cl';
+
+async function ensureAdminAccount() {
+  const users = getUsers();
+  if (!users[ADMIN_EMAIL]) {
+    // Crea la cuenta admin si no existe (contraseña: admin1234)
+    users[ADMIN_EMAIL] = {
+      name: 'Admin FE',
+      hash: await sha256('admin1234'),
+      createdAt: new Date().toISOString(),
+      isAdmin: true,
+    };
+    saveUsers(users);
+  }
+}
+
+function isAdminAccount(email) {
+  const users = getUsers();
+  return users[email]?.isAdmin === true;
+}
+
 /* ── INICIAR SESIÓN ───────────────────────────────────────────── */
 async function handleLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -195,10 +223,18 @@ async function handleLogin() {
   const hash = await sha256(pass);
   if (users[email].hash !== hash) return showError('login-error', '❌ Contraseña incorrecta.');
 
-  const session = { email, name: users[email].name };
+  const session = { email, name: users[email].name, isAdmin: users[email].isAdmin || false };
   saveSession(session);
   resetInactivityTimer();
   updateNavAuth(session);
+
+  // Si es cuenta admin, redirigir al panel de administración
+  if (session.isAdmin) {
+    showToast(`🔐 Bienvenido al panel admin, ${session.name}!`);
+    setTimeout(() => { window.location.href = 'admin.html'; }, 800);
+    return;
+  }
+
   showLoggedForm(session);
   showToast(`¡Bienvenido de vuelta, ${session.name}! 👋`);
 }
