@@ -366,6 +366,158 @@
     /* ── HIDDEN ── */
     .hidden { display: none !important; }
 
+    /* ══════════════════════════════════════════
+       NOTICES PANEL — Avisos personalizados
+    ══════════════════════════════════════════ */
+    .notices-panel {
+      background: var(--surface);
+      border: 1.5px solid rgba(212,168,67,.35);
+      border-radius: 14px;
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 2rem;
+    }
+    .notices-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: .8rem;
+    }
+    .notices-panel-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .notices-panel-title em { color: var(--gold); font-style: italic; }
+    .notices-panel-desc { font-size: .82rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+    /* Form de creación */
+    .notice-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: .8rem;
+      align-items: end;
+      margin-bottom: 1.4rem;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 700px) {
+      .notice-form { grid-template-columns: 1fr; }
+    }
+    .notice-field { display: flex; flex-direction: column; gap: .35rem; }
+    .notice-field label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .notice-input, .notice-select, .notice-textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .5rem .9rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    .notice-input:focus, .notice-select:focus, .notice-textarea:focus { border-color: var(--gold-dim); }
+    .notice-textarea { resize: vertical; min-height: 62px; }
+    .notice-form-full { grid-column: 1 / -1; }
+
+    /* Botón añadir */
+    .btn-notice-add {
+      background: rgba(212,168,67,.12);
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      padding: .55rem 1.3rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      align-self: end;
+      white-space: nowrap;
+    }
+    .btn-notice-add:hover { background: rgba(212,168,67,.22); }
+    .btn-notice-add:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* Lista de avisos activos */
+    .notices-list { display: flex; flex-direction: column; gap: .7rem; }
+    .notice-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem 1rem;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn .3s ease;
+    }
+    .notice-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 10px 0 0 10px;
+    }
+    .notice-item[data-type="schedule"]::before { background: var(--warn); }
+    .notice-item[data-type="custom"]::before   { background: var(--gold); }
+    .notice-item[data-type="closure"]::before  { background: var(--agotado); }
+
+    .notice-item-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+    .notice-item-body { flex: 1; min-width: 0; }
+    .notice-item-type {
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: .2rem;
+    }
+    .notice-item[data-type="schedule"] .notice-item-type { color: var(--warn); }
+    .notice-item[data-type="custom"]   .notice-item-type { color: var(--gold); }
+    .notice-item[data-type="closure"]  .notice-item-type { color: var(--agotado); }
+    .notice-item-text { font-size: .85rem; color: var(--text); line-height: 1.45; word-break: break-word; }
+    .notice-item-meta { font-size: .73rem; color: var(--muted); margin-top: .25rem; }
+    .notice-item-meta span { color: var(--muted); }
+
+    .btn-notice-delete {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: .85rem;
+      flex-shrink: 0;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .btn-notice-delete:hover { border-color: var(--agotado); color: var(--agotado); background: rgba(224,82,82,.08); }
+
+    .notices-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+      padding: 1.2rem;
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+    .notices-counter {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: .8rem;
+    }
+    .notices-counter strong { color: var(--gold); }
+
     /* ── SHIFT PANEL ── */
     .shift-panel {
       background: var(--surface);
@@ -662,6 +814,50 @@
     <p>Activa o desactiva ingredientes. Los cambios se reflejan al instante en el menú para los clientes.</p>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       AVISOS PERSONALIZADOS
+  ══════════════════════════════════════════ -->
+  <div class="notices-panel" id="notices-panel-admin">
+    <div class="notices-panel-header">
+      <div class="notices-panel-title">📢 Avisos para <em>clientes</em></div>
+      <span class="section-pill-admin" id="notices-status-pill">● Sin avisos activos</span>
+    </div>
+    <p class="notices-panel-desc">
+      Los avisos aparecen como banners en la parte superior del sitio. Puedes tener hasta 3 activos simultáneamente.
+    </p>
+
+    <!-- Form -->
+    <div class="notice-form" id="notice-form">
+      <div class="notice-field">
+        <label>Tipo de aviso</label>
+        <select class="notice-select" id="notice-type" onchange="updateNoticeIcon()">
+          <option value="schedule">⏰ Horario especial / Cierre temporal</option>
+          <option value="custom">📌 Aviso libre</option>
+        </select>
+      </div>
+      <div class="notice-field">
+        <label>Emoji / Ícono</label>
+        <input class="notice-input" id="notice-icon" type="text" maxlength="2" placeholder="⏰" style="max-width:80px;text-align:center;font-size:1.2rem;">
+      </div>
+      <div class="notice-field notice-form-full">
+        <label>Mensaje <span style="font-style:normal;text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400">(máx. 160 caracteres)</span></label>
+        <input class="notice-input" id="notice-text" type="text" maxlength="160" placeholder="Hoy cerramos a las 20:00 — ¡gracias por su preferencia!">
+      </div>
+      <div class="notice-field notice-form-full" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem">
+        <span style="font-size:.78rem;color:var(--muted)" id="notice-char-count">0 / 160 caracteres</span>
+        <button class="btn-notice-add" id="btn-notice-add" onclick="addNotice()">📢 Publicar aviso</button>
+      </div>
+    </div>
+
+    <!-- Lista activos -->
+    <div id="notices-counter-row" class="notices-counter" style="display:none">
+      Avisos activos: <strong id="notices-active-count">0</strong> / 3
+    </div>
+    <div class="notices-list" id="notices-list">
+      <div class="notices-empty">No hay avisos activos. Los clientes verán el sitio sin banners.</div>
+    </div>
+  </div>
+
   <!-- CAMBIO DE TURNO -->
   <div class="shift-panel" id="shift-panel-admin">
     <div class="shift-panel-header">
@@ -810,7 +1006,13 @@ const MENU_ITEMS = [
   { id:'sandwich-huevo-4',    emoji:'🥚', name:'Huevo y Queso',           desc:'Con huevo y queso.',                      price:2000, category:'huevo'    },
   { id:'sandwich-huevo-5',    emoji:'🥚', name:'Huevo y Ciboulette',      desc:'Con huevo y ciboulette.',                 price:1500, category:'huevo'    },
   // Mechada
-  { id:'sandwich-mechada-1',  emoji:'🥩', name:'Mechada clásica',         desc:'Con mechada y 2 huevos fritos.',          price:3000, category:'mechada'  },
+  { id:'sandwich-mechada-1',  emoji:'🥩', name:'Mechada clásica',      desc:'Con mechada y 2 huevos fritos.',                             price:3000, category:'mechada'  },
+  { id:'sandwich-mechada-2',  emoji:'🥩', name:'Mechada abundante',    desc:'Con mechada, porotos verdes, tomate, aji verde y mayonesa.',  price:4500, category:'mechada'  },
+  { id:'sandwich-mechada-3',  emoji:'🥩', name:'Mechada dorada',       desc:'Con cebolla caramelizada y queso derretido.',                price:3500, category:'mechada'  },
+  { id:'sandwich-mechada-4',  emoji:'🥩', name:'Mechada verde',        desc:'Con palta, tomate y mayonesa.',                              price:3500, category:'mechada'  },
+  { id:'sandwich-mechada-5',  emoji:'🥩', name:'Mechada del bosque',   desc:'Con champiñones salteados y queso.',                         price:3500, category:'mechada'  },
+  { id:'sandwich-mechada-6',  emoji:'🥩', name:'Mechada simple',       desc:'La base perfecta: mechada y queso, nada más.',               price:3000, category:'mechada'  },
+
   // Personalizado
   { id:'sandwich-custom',     emoji:'🛠', name:'Sandwich Personalizado',  desc:'Arma tu sandwich desde cero.',            price:3000, category:'custom'   },
   // Postres
@@ -833,12 +1035,13 @@ const EXTRAS_DATA = [
   { id:'huevo',   emoji:'🥚', name:'Huevo frito',          price:500,  category:'extras' },
   { id:'palta',   emoji:'🥑', name:'Palta',                price:600,  category:'extras' },
   { id:'queso',   emoji:'🧀', name:'Queso extra',          price:400,  category:'extras' },
-  { id:'salmon',  emoji:'🐟', name:'Salmón',               price:1500, category:'extras' },
   { id:'pepino',  emoji:'🥒', name:'Pepino',               price:200,  category:'extras' },
   { id:'choclo',  emoji:'🌽', name:'Choclo',               price:300,  category:'extras' },
   { id:'cebolla', emoji:'🧅', name:'Cebolla caramelizada', price:400,  category:'extras' },
   { id:'champi',  emoji:'🍄', name:'Champiñones',          price:500,  category:'extras' },
-];
+  { id:'tomate',  emoji:'🍅', name:'Tomate',                 price:200,  category:'extras'  },
+  { id:'huevo frito', emoji:'🍳', name:'Huevo Frito',        price:350,  category:'extras'  }
+  ];  
 
 const SAUCES_DATA = [
   { id:'mayo',        emoji:'🤍', name:'Mayonesa',      price:0,   category:'sauces' },
@@ -1424,6 +1627,149 @@ window.addEventListener('storage', (e) => {
     }
   }
 });
+
+/* ══════════════════════════════════════════
+   NOTICES — Avisos personalizados para clientes
+══════════════════════════════════════════ */
+const NOTICES_KEY     = 'fe_notices';
+const MAX_NOTICES     = 3;
+
+const NOTICE_ICONS = {
+  schedule: '⏰',
+  custom:   '📌',
+};
+
+const NOTICE_LABELS = {
+  schedule: 'Horario especial',
+  custom:   'Aviso libre',
+};
+
+function getNotices() {
+  try { return JSON.parse(localStorage.getItem(NOTICES_KEY) || '[]'); } catch { return []; }
+}
+function saveNotices(arr) {
+  localStorage.setItem(NOTICES_KEY, JSON.stringify(arr));
+}
+
+function updateNoticeIcon() {
+  const type = document.getElementById('notice-type').value;
+  const iconInput = document.getElementById('notice-icon');
+  iconInput.value = NOTICE_ICONS[type] || '📌';
+}
+
+// Contador de caracteres
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('notice-text');
+  if (inp) {
+    inp.addEventListener('input', () => {
+      const el = document.getElementById('notice-char-count');
+      if (el) el.textContent = `${inp.value.length} / 160 caracteres`;
+    });
+  }
+  // Inicializar ícono
+  updateNoticeIcon();
+  renderNoticesAdmin();
+});
+
+function addNotice() {
+  const type  = document.getElementById('notice-type').value;
+  const icon  = document.getElementById('notice-icon').value.trim() || NOTICE_ICONS[type];
+  const text  = document.getElementById('notice-text').value.trim();
+
+  if (!text) return showAdminToast('⚠️ Escribe el mensaje del aviso.');
+
+  const notices = getNotices();
+  if (notices.length >= MAX_NOTICES) {
+    showAdminToast(`⚠️ Máximo ${MAX_NOTICES} avisos simultáneos. Elimina uno primero.`);
+    return;
+  }
+
+  const id = `n_${Date.now()}`;
+  notices.push({ id, type, icon, text, createdAt: new Date().toISOString() });
+  saveNotices(notices);
+  renderNoticesAdmin();
+  changesCount++;
+  updateStats();
+  showAdminToast(`📢 Aviso publicado — visible para los clientes`);
+  logNoticeChange('add', text);
+
+  // Limpiar form
+  document.getElementById('notice-text').value = '';
+  document.getElementById('notice-char-count').textContent = '0 / 160 caracteres';
+}
+
+function removeNotice(id) {
+  const notices = getNotices().filter(n => n.id !== id);
+  saveNotices(notices);
+  renderNoticesAdmin();
+  changesCount++;
+  updateStats();
+  showAdminToast('🗑 Aviso eliminado');
+  logNoticeChange('remove');
+}
+
+function renderNoticesAdmin() {
+  const notices = getNotices();
+  const list    = document.getElementById('notices-list');
+  const pill    = document.getElementById('notices-status-pill');
+  const counter = document.getElementById('notices-counter-row');
+  const countEl = document.getElementById('notices-active-count');
+  const addBtn  = document.getElementById('btn-notice-add');
+
+  // Pill de estado
+  if (notices.length > 0) {
+    pill.textContent = `● ${notices.length} aviso${notices.length > 1 ? 's' : ''} activo${notices.length > 1 ? 's' : ''}`;
+    pill.style.background   = 'rgba(212,168,67,.15)';
+    pill.style.color        = 'var(--gold)';
+    pill.style.borderColor  = 'rgba(212,168,67,.4)';
+    counter.style.display   = 'block';
+    countEl.textContent     = notices.length;
+  } else {
+    pill.textContent = '● Sin avisos activos';
+    pill.style.background  = 'var(--surface2)';
+    pill.style.color       = 'var(--muted)';
+    pill.style.borderColor = '';
+    counter.style.display  = 'none';
+  }
+
+  // Deshabilitar botón si lleno
+  if (addBtn) addBtn.disabled = notices.length >= MAX_NOTICES;
+
+  if (!notices.length) {
+    list.innerHTML = '<div class="notices-empty">No hay avisos activos. Los clientes verán el sitio sin banners.</div>';
+    return;
+  }
+
+  list.innerHTML = notices.map(n => {
+    const date = new Date(n.createdAt).toLocaleString('es-CL', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+    return `
+      <div class="notice-item" data-type="${n.type}">
+        <span class="notice-item-icon">${n.icon}</span>
+        <div class="notice-item-body">
+          <div class="notice-item-type">${NOTICE_LABELS[n.type] || n.type}</div>
+          <div class="notice-item-text">${n.text}</div>
+          <div class="notice-item-meta">Publicado: ${date}</div>
+        </div>
+        <button class="btn-notice-delete" onclick="removeNotice('${n.id}')" title="Eliminar aviso">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function logNoticeChange(action, text) {
+  const el = document.getElementById('activity-log');
+  const now = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const entry = document.createElement('div');
+  entry.className = 'log-item';
+  const msg = action === 'add'
+    ? `📢 <strong>Aviso publicado</strong>: "${(text||'').slice(0,50)}${(text||'').length > 50 ? '…' : ''}"`
+    : `🗑 <strong>Aviso eliminado</strong>`;
+  entry.innerHTML = `<div class="log-dot ${action === 'add' ? 'on' : 'off'}"></div><div class="log-text">${msg}</div><div class="log-time">${now}</div>`;
+  const empty = el.querySelector('.log-empty');
+  if (empty) empty.remove();
+  el.prepend(entry);
+  const entries = el.querySelectorAll('.log-item');
+  if (entries.length > 20) entries[entries.length - 1].remove();
+}
 
 /* ══════════════════════════════════════════
    INIT

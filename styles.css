@@ -226,11 +226,11 @@ nav ul li a:hover { color: var(--cafe-medio); }
   font-size: 5rem;
   position: relative;
 }
-.bg-1 { background: linear-gradient(135deg,#fdf0d0,#f5dfa0); }
-.bg-2 { background: linear-gradient(135deg,#ecdec8,#d9c9a8); }
-.bg-3 { background: linear-gradient(135deg,#e8ddd4,#d4c4b0); }
-.bg-4 { background: linear-gradient(135deg,#fde8cc,#f5cfa0); }
-.bg-5 { background: linear-gradient(135deg,#e0d4c4,#cfc0aa); }
+.bg-1 { background: url('imagenes/menuhuevo4.jpeg')  center/cover no-repeat; }
+.bg-2 { background: url('imagenes/menuhuevo5.jpeg') center/cover no-repeat; }
+.bg-3 { background: url('imagenes/menuhuevo3.jpeg')  center/cover no-repeat; }
+.bg-4 { background: url('imagenes/menu huevo2.jpeg')  center/cover no-repeat; }
+.bg-5 { background: url('imagenes/menu huevo.jpeg')  center/cover no-repeat; }
 .bg-6 { background: linear-gradient(135deg,#f8ead8,#efd5b5); }
 
 .card-badge {
@@ -587,6 +587,19 @@ footer ul li a:hover { color: var(--dorado); }
   background: linear-gradient(to right, #c9a96e, transparent);
 }
 
+/*── Mechada ──────────────────────────────────────────────── */
+.bg-mechada-1 { background: url('imagenes/menu mechada6.jpeg')  center/cover no-repeat; }
+.bg-mechada-2 { background: url('imagenes/menu mechada.jpeg') center/cover no-repeat; }
+.bg-mechada-3 { background: url('imagenes/menu mechada3.jpeg') center/cover no-repeat; }
+.bg-mechada-4 { background: url('imagenes/menu mechada4.jpeg') center/cover no-repeat; }
+.bg-mechada-5 { background: url('imagenes/menu mechada5.jpeg') center/cover no-repeat; }
+.bg-mechada-6 { background: url('imagenes/menu mechada6.jpeg') center/cover no-repeat; }
+
+/*── Bebidas ──────────────────────────────────────────────── */
+.bg-bebida-agua { background: linear-gradient(135deg, #d6eaf8, #aed6f1); }
+.bg-bebida-jugo { background: linear-gradient(135deg, #fdebd0, #f8c471); }
+.bg-bebida-cola { background: linear-gradient(135deg, #f9ebea, #f1948a); }
+
 /*── Postres ─────────────────────────────────────────────── */
 .bg-postre-1 { background: #f5e6d3; }
 .bg-postre-2 { background: #ede0f5; }
@@ -867,6 +880,39 @@ footer ul li a:hover { color: var(--dorado); }
   transition: background .2s;
 }
 .mp-link:hover { background: var(--cafe-medio); }
+/* ── BAES · Edenred ─────────────────────────────────────────── */
+.baes-box {
+  background: linear-gradient(135deg, #eaf4fb, #d4e9f7);
+  border: 1.5px solid #aed6f1;
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  display: flex; flex-direction: column; gap: .8rem;
+}
+.baes-logo {
+  font-weight: 700; font-size: .98rem; color: #1a5276;
+}
+.baes-desc {
+  font-size: .84rem; color: #2c3e50; margin: 0;
+}
+.baes-input-wrap {
+  position: relative;
+}
+.baes-input {
+  width: 100%; letter-spacing: .12em;
+  font-size: 1.05rem; font-family: monospace;
+  padding-right: 2.6rem !important;
+}
+.baes-input-icon {
+  position: absolute; right: .8rem; top: 50%;
+  transform: translateY(-50%); font-size: 1.1rem; pointer-events: none;
+}
+.baes-note {
+  font-size: .78rem; color: #555;
+  background: rgba(255,255,255,.65);
+  border-radius: 8px; padding: .45rem .7rem;
+}
+
+
 
 /* Resumen de pago */
 .pay-summary {

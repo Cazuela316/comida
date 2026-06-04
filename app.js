@@ -11,28 +11,30 @@ const EXTRAS = [
   { id:'huevo',   emoji:'🥚', name:'Huevo frito',            price:500  },
   { id:'palta',   emoji:'🥑', name:'Palta',                  price:600  },
   { id:'queso',   emoji:'🧀', name:'Queso extra',            price:400  },
-  { id:'salmon',  emoji:'🐟', name:'Salmón',                 price:1500 },
   { id:'pepino',  emoji:'🥒', name:'Pepino',                 price:200  },
   { id:'choclo',  emoji:'🌽', name:'Choclo',                 price:300  },
   { id:'cebolla', emoji:'🧅', name:'Cebolla caramelizada',   price:400  },
   { id:'champi',  emoji:'🍄', name:'Champiñones',            price:500  },
+  { id:'tomate',  emoji:'🍅', name:'Tomate',                 price:200  },
+  { id:'huevo frito', emoji:'🍳', name:'Huevo Frito',        price:350  },  
+
 ];
 
 const SAUCES = [
-  { id:'mayo',         emoji:'🤍', name:'Mayonesa',      price:0   },
+  { id:'mayo',         emoji:'🤍', name:'Mayonesa',       price:0   },
   { id:'ketchup',      emoji:'❤️',  name:'Ketchup',       price:0   },
-  { id:'mostaza',      emoji:'💛', name:'Mostaza',       price:0   },
-  { id:'mayo-ajo',     emoji:'🧄', name:'Mayo ajo',      price:200 },
-  { id:'bbq',          emoji:'🟤', name:'BBQ',           price:200 },
-  { id:'picante',      emoji:'🌶️', name:'Salsa picante', price:200 },
-  { id:'chimichurri',  emoji:'🌿', name:'Chimichurri',   price:300 },
+  { id:'mostaza',      emoji:'💛', name:'Mostaza',        price:0   },
+  { id:'mayo-ajo',     emoji:'🧄', name:'Mayo ajo',       price:200 },
+  { id:'bbq',          emoji:'🟤', name:'BBQ',            price:200 },
+  { id:'picante',      emoji:'🌶️', name:'Salsa picante',  price:200 },
+  { id:'chimichurri',  emoji:'🌿', name:'Chimichurri',    price:300 },
 ];
 
 const LAYER_COLORS = {
-  '🥬':'#5a9e5a', '🍅':'#c0392b', '🧅':'#9b59b6', '🥩':'#7b3a18',
+  '🥬':'#5a9e5a', '🍅':'#c0392b', '🧅':'#9b59b6', '🥩':'#7b3a18', '🍳':'#bda762',
   '🥚':'#e8a000', '🥑':'#5d8a3c', '🧀':'#e8c840', '🍗':'#c8782a',
-  '🐷':'#d4826a', '🐟':'#5a8ac0', '🥒':'#7ab87a', '🌽':'#e8c040',
-  '🍄':'#9b7040', '🧄':'#d4c070', '🥓':'#c84820',
+  '🐷':'#d4826a', '🥒':'#7ab87a', '🌽':'#e8c040', '🌿':'#00521b',
+  '🍄':'#9b7040', '🧄':'#d4c070', '🥓':'#c84820', '🌶️':'#21aa4e'
 };
 
 const DELIVERY_COST   = 1500;
@@ -534,7 +536,7 @@ function selectPayMethod(method) {
   selectedPayMethod = method;
   document.querySelectorAll('.pay-method').forEach(el => el.classList.remove('selected'));
   document.getElementById('pm-' + method).classList.add('selected');
-  ['transfer','card','cash','mercadopago'].forEach(m => {
+  ['transfer','card','cash','mercadopago','baes'].forEach(m => {
     const el = document.getElementById('pay-detail-' + m);
     if (el) el.style.display = m === method ? 'block' : 'none';
   });
@@ -586,8 +588,24 @@ function showOrderReadyBanner(num) {
   showToast('🔔 ¡Tu pedido está listo!');
 }
 
+
+// ── BAES · Edenred ────────────────────────────────────────────
+function formatBaesCode(input) {
+  // Formatea como grupos de 4: XXXX XXXX XXXX XXXX
+  let val = input.value.replace(/\D/g, '').slice(0, 16);
+  input.value = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+}
+
 // ── CONFIRMAR PEDIDO ──────────────────────────────────────────
 function confirmOrder() {
+  // Validar código BAES si fue el método elegido
+  if (selectedPayMethod === 'baes') {
+    const baesVal = (document.getElementById('baes-code')?.value || '').replace(/\s/g,'');
+    if (baesVal.length < 16) {
+      showToast('⚠️ Ingresa tu código BAES completo (16 dígitos).');
+      return;
+    }
+  }
   document.getElementById('payment-overlay').style.display = 'none';
 
   const orderNum  = '#' + String(Math.floor(Math.random() * 9000) + 1000);
@@ -613,7 +631,7 @@ function confirmOrder() {
     ? `${15+extraMin}–${20+extraMin} min`
     : `${30+extraMin}–${45+extraMin} min`;
 
-  const payLabels      = { transfer:'Transferencia bancaria', card:'Tarjeta débito/crédito', cash:'Efectivo', mercadopago:'Mercado Pago' };
+  const payLabels      = { transfer:'Transferencia bancaria', card:'Tarjeta débito/crédito', cash:'Efectivo', mercadopago:'Mercado Pago', baes:'BAES · Edenred (JUNAEB)' };
   const deliveryLabels = { delivery:'🛵 Delivery (30–45 min)', pickup:'🏪 Retiro en local (15–20 min)' };
 
   document.getElementById('confirm-order-num').textContent = orderNum;
